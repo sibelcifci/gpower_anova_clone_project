@@ -1,0 +1,45 @@
+id,mod,f,alpha,power,groups,total_n,n_per_group,actual_power,critical_f,df1,df2,lambda,screenshot,kaynak,notlar
+1,a_priori,0.25,0.05,0.95,4,280,70,0.9509908,2.6373109,3,276,17.5000000,v1.png,grup1,
+2,a_priori,0.10,0.05,0.80,3,969,323,0.8011010,3.0050418,2,966,9.6900000,v2.png,grup1,
+3,a_priori,0.40,0.05,0.80,3,66,22,0.8180744,3.1428085,2,63,10.5600000,v3.png,grup1,
+4,a_priori,0.25,0.05,0.80,2,128,64,0.8014596,3.9163246,1,126,8.0000000,v4.png,grup1,
+5,a_priori,0.25,0.05,0.80,5,200,40,0.8097710,2.4179625,4,195,12.5000000,v5.png,grup1,
+6,a_priori,0.25,0.05,0.80,10,260,26,0.8019886,1.9174493,9,250,16.2500000,v6.png,grup1,
+7,a_priori,0.15,0.01,0.90,4,864,216,0.9012454,3.8044523,3,860,19.4400000,v7.png,grup1,
+8,a_priori,0.30,0.01,0.95,3,237,79,0.9528499,4.6970018,2,234,21.3300000,v8.png,grup1,
+9,a_priori,0.50,0.05,0.90,3,54,18,0.9015607,3.1787993,2,51,13.5000000,v9.png,grup1,
+10,a_priori,0.20,0.05,0.80,6,330,55,0.8052864,2.2418515,5,324,13.2000000,v10.png,grup1,
+11,a_priori,0.25,0.10,0.80,3,126,42,0.8008668,2.3462330,2,123,7.8750000,v11.png,grup1,
+12,a_priori,0.35,0.05,0.95,5,160,32,0.9547381,2.4300023,4,155,19.6000000,v12.png,grup1,
+13,a_priori,0.25,0.05,0.90,8,304,38,0.9049674,2.0405753,7,296,19.0000000,v13.png,grup1,
+14,a_priori,0.45,0.025,0.85,4,76,19,0.8501249,3.3034207,3,72,15.3900000,v14.png,grup1,
+15,a_priori,0.25,0.05,0.80,3,159,53,0.8048873,3.0540042,2,156,9.9375000,v15.png,grup1,
+16,a_priori,0.25,0.01,0.80,3,228,76,0.8029054,4.7007255,2,225,14.2500000,v16.png,grup1,
+17,a_priori,0.25,0.05,0.95,3,252,84,0.9514888,3.0320649,2,249,15.7500000,v17.png,grup1,
+18,a_priori,0.25,0.01,0.95,3,336,112,0.9506719,4.6694479,2,333,21.0000000,v18.png,grup1,
+19,a_priori,0.10,0.05,0.95,3,1548,516,0.9500866,3.0015485,2,1545,15.4800000,v19.png,grup1,
+20,a_priori,0.10,0.05,0.80,3,969,323,0.8011010,3.0050418,2,966,9.6900000,v20.png,grup1,"id 2 ile aynı girdi vektörü, aynı kaynak; çıktılar birebir aynı"
+21,a_priori,0.10,0.05,0.90,3,1269,423,0.9001453,3.0028323,2,1266,12.6900000,v21.png,grup1,
+22,a_priori,0.10,0.01,0.80,3,1395,465,0.8008513,4.6204392,2,1392,13.9500000,v22.png,grup1,
+23,a_priori,0.40,0.05,0.80,3,66,22,0.8180744,3.1428085,2,63,10.5600000,v23.png,grup1,"id 3 ile aynı girdi vektörü, aynı kaynak; çıktılar birebir aynı"
+24,a_priori,0.40,0.05,0.90,3,84,28,0.9068362,3.1093105,2,81,13.4400000,v24.png,grup1,
+25,a_priori,0.40,0.05,0.95,3,102,34,0.9547295,3.0882396,2,99,16.3200000,v25.png,grup1,
+26,a_priori,0.40,0.01,0.80,3,93,31,0.8090216,4.8490583,2,90,14.8800000,v26.png,grup1,
+27,a_priori,0.15,0.01,0.80,3,624,208,0.8020293,4.6394904,2,621,14.0400000,v27.png,grup1,
+28,a_priori,0.30,0.05,0.85,3,126,42,0.8548129,3.0698942,2,123,11.3400000,v28.png,grup1,
+29,a_priori,0.50,0.05,0.80,3,42,14,0.8034136,3.2380961,2,39,10.5000000,v29.png,grup1,
+30,a_priori,0.25,0.05,0.80,3,159,53,0.8048873,3.0540042,2,156,9.9375000,v30.png,grup1,"id 15 ile ayni girdi vektoru, ayni kaynak; ciktilar birebir ayni"
+31,post_hoc,0.25,0.05,,3,159,53,0.8048873,3.0540042,2,156,9.9375000,v31.png,grup1,post hoc; id 15/30'un a priori sonucuyla birebir ayni (ters yon tutarliligi)
+32,post_hoc,0.25,0.05,,3,100,,0.5885389,3.0901867,2,97,6.2500000,v32.png,grup1,"UYARI kutusu ""Please note"": ""The total sample size (100) is not a multiple of the number of groups (3). The analysis was based on the average group size."" Hesap yine de yapildi. Girdi alanlari kutunun arkasinda; esi id 33'ten alindi"
+33,post_hoc,0.25,0.05,,3,100,,0.5885389,3.0901867,2,97,6.2500000,v33.png,grup1,id 32'nin uyari kutusu kapatilmis hali; tum alanlar gorunur
+34,post_hoc,0.25,0.05,,4,280,70,0.9509908,2.6373109,3,276,17.5000000,v34.png,grup1,post hoc; id 1'in a priori sonucuyla birebir ayni (ters yon tutarliligi)
+35,post_hoc,0.25,0.05,,4,101,,0.5228374,2.6983975,3,97,6.3125000,v35.png,grup1,"UYARI kutusu ""Please note"": ""The total sample size (101) is not a multiple of the number of groups (4). The analysis was based on the average group size."" Hesap yine de yapildi. Girdi alanlari kutunun arkasinda; esi id 36'ten alindi"
+36,post_hoc,0.25,0.05,,4,101,,0.5228374,2.6983975,3,97,6.3125000,v36.png,grup1,id 35'in uyari kutusu kapatilmis hali; tum alanlar gorunur
+37,post_hoc,,0.05,,3,3,1,,,,,,v37.png,grup1,"HATA: ""Input error"" kutusu, mesaj: ""Sample size must be greater than the number of groups (3)."" Butun cikti alanlari ""?"" gosteriyor. okunamadi: Effect size f alani hata kutusunun arkasinda kaldi"
+38,post_hoc,,0.05,,3,2,,,,,,,v38.png,grup1,"HATA: ""Input error"" kutusu, mesaj: ""Sample size must be greater than the number of groups (3)."" Butun cikti alanlari ""?"" gosteriyor. okunamadi: Effect size f alani hata kutusunun arkasinda kaldi"
+39,post_hoc,0.25,0.05,,3,4,,0.0530691,199.5,2,1,0.2500000,v39.png,grup1,"UYARI kutusu ""Please note"": ""The total sample size (4) is not a multiple of the number of groups (3). The analysis was based on the average group size."" Hesap yine de yapildi. Girdi alanlari kutunun arkasinda; esi id 40'ten alindi"
+40,post_hoc,0.25,0.05,,3,4,,0.0530691,199.5,2,1,0.2500000,v40.png,grup1,id 39'un uyari kutusu kapatilmis hali; df2=1 sinir vakasi
+41,post_hoc,0.40,0.05,,3,30,10,0.4420732,3.3541308,2,27,4.8000000,v41.png,grup1,
+42,post_hoc,0.10,0.05,,3,30,10,0.0707888,3.3541308,2,27,0.3000000,v42.png,grup1,
+43,post_hoc,0,0.05,,3,150,50,0.0500000,3.0576207,2,147,0,v43.png,grup1,"f=0 -> lambda=0 -> guc TAM OLARAK alfaya esit. Hata verilmedi. lambda alani ""0"" olarak gosterildi (7 ondalik DEGIL)"
+44,post_hoc,2.0,0.05,,3,30,10,1.0000000,3.3541308,2,27,120,v44.png,grup1,"guc 1.0000000 olarak gosterildi. lambda alani ""120"" olarak gosterildi (7 ondalik DEGIL)"

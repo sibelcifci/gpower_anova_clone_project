@@ -1,0 +1,22 @@
+# G*Power ikilisi ve kurulum dosyalari repoya ASLA girmez
+GPower.exe
+*.exe
+GPower*/
+*.msi
+*.zip
+
+# Orijinal ham ekran goruntusu klasoru
+# (calisma kopyalari oracle/screenshots/ altinda, onlar izlenir)
+images/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Isletim sistemi
+Thumbs.db
+desktop.ini
+.DS_Store
