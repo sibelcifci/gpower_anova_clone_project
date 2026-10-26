@@ -33,7 +33,8 @@ def _ayristirici():
                    help="etki büyüklüğü f (Cohen)")
     p.add_argument("--alpha", type=float, default=None, help="alfa hata olasılığı")
     p.add_argument("--power", type=float, default=None, help="hedef güç (a_priori)")
-    p.add_argument("--groups", "-k", type=int, default=None, help="grup sayısı k")
+    p.add_argument("--groups", "-k", type=float, default=None,
+                   help="grup sayısı k; kesirli değer SPEC 6.5 uyarınca yuvarlanır")
     p.add_argument("--total-n", "--total_n", "-n", dest="total_n", type=int,
                    default=None, help="toplam örneklem N (post_hoc)")
     p.add_argument("--json", default=None,
