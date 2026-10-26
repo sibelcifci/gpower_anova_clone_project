@@ -24,13 +24,13 @@ F_ALT_POST_HOC = 0.0          # id 58 mesajı (0, 50) der; id 43 f=0'ı KABUL ed
 ALFA_ALT, ALFA_UST = 1e-07, 1.0
 GUC_ALT, GUC_UST = 1e-07, 1.0
 
-# SPEC 6.5 — tam sayı olmayan grup sayısı sessizce tam sayıya çevrilir (id 56).
-# 2.5 -> 3 gözlemi hem ceil'i hem "en yakına yuvarlama"yı doğruluyor; ayırt
-# edilmedi. Burada en yakına yuvarlama (yarımda yukarı) seçildi; ayırt edici
-# vektör (groups=2.4) toplanınca bu tek satır güncellenecek.
-# TODO: SPEC 6.5, id 60 bekleniyor.
+# SPEC 6.5 — tam sayı olmayan grup sayısı sessizce tam sayıya çevrilir.
+# Yön iki oracle satırıyla belirlendi: id 60 (2.4 -> k=2, N=128) ve
+# id 56 (2.5 -> k=3, N=159). Aşağı/yukarı ayrımı 2.4'te, yarımın yukarı
+# gittiği 2.5'te görüldü. Python'un round() fonksiyonu KULLANILAMAZ:
+# banker yuvarlaması yapar ve round(2.5) = 2 verir, bu id 56 ile çelişir.
 def _grup_sayisi(ham):
-    """Grup sayısını tam sayıya çevirir (SPEC 6.5). Yuvarlama yönü BELİRSİZ."""
+    """Grup sayısını en yakın tam sayıya yuvarlar, yarımda yukarı (SPEC 6.5)."""
     return int(math.floor(ham + 0.5))
 
 

@@ -489,10 +489,26 @@ Bu, G*Power'ın **sessiz veri dönüşümü** yaptığı tek yerdir: `N`'in `k`'
 olmaması durumunda bir `Please note` kutusu gösterilirken (bölüm 4.2), burada
 hiçbir uyarı yoktur.
 
-> **BELİRSİZ — yuvarlama yönü.** `2.5 → 3` hem yukarı yuvarlamayla (ceil) hem
-> en yakına yuvarlamayla açıklanır. Ayırt edici vektör `groups = 2.4`:
-> ceil ise N=159, en yakına yuvarlama ise N=128 beklenir.
-> TODO: id 60 toplanacak.
+**Yuvarlama yönü ÇÖZÜLDÜ (id 60).** `groups = 2.4` verildiğinde N=128 çıktı
+ve `df1 = 1` oldu, yani **k=2** kullanıldı. Yukarı yuvarlama olsaydı k=3 ve
+N=159 çıkardı. Kural: **en yakına yuvarlama**.
+
+```gherkin
+  Scenario Outline: Kesirli grup sayısı en yakın tam sayıya yuvarlanır
+    Given a priori modda f=0.25, alpha=0.05, power=0.80 verilir
+    And groups alanına <giris> yazılır
+    Then hesap <k> ile yapılır ve toplam N <n> olur
+
+    Examples:
+      | giris | k | n   | id |
+      | 2.4   | 2 | 128 | 60 |
+      | 2.5   | 3 | 159 | 56 |
+```
+
+İki satır birlikte yönü belirler: 2.4 aşağı, 2.5 yukarı gider. Yarım
+değerinin yukarı mı en yakın çifte mi gittiği (banker yuvarlaması) ayrıca
+sınanmadı; 2.5 → 3 yukarı yuvarlamayla uyumludur, banker yuvarlaması 2
+verirdi — yani **yarımda yukarı**.
 
 ### 6.6 Sayısal olmayan metin ayrı mesaj almaz
 

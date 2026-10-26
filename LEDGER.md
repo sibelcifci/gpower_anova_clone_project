@@ -120,7 +120,8 @@ ikili kanıtı henüz yok. `[REA]` adayları bölüm 4.2'de.
 | AJ-22 | **`f` alanının aralığı moda bağlıdır:** a priori `(1e-06, 50)`, post hoc `(0, 50)` | **3/3** | id 45, 46 (a priori) ↔ id 58 (post hoc) |
 | AJ-23 | **Gösterilen aralık ile davranış çelişir:** post hoc mesajı `(0, 50)` der ama `f = 0` kabul edilir | **1 çelişki** | id 58 mesajı ↔ id 43 sonucu (güç = α = 0.0500000) |
 | AJ-24 | `groups < 2` aralık kalıbını **kullanmaz**, ayrı metin verir: `"There must be at least 2 groups."` | **3/3** | id 53 (k=1), 54 (k=0), 55 (k=−3) |
-| AJ-25 | **Tam sayı olmayan grup sayısı sessizce kabul edilir:** `groups = 2.5` hata ve **uyarı kutusu olmadan** `k=3` sonucunu verir | **1/1** | id 56 = id 15/30 ile birebir aynı çıktı (N=159, df1=2, df2=156, λ=9.9375000) |
+| AJ-25 | **Tam sayı olmayan grup sayısı sessizce kabul edilir:** hata ve **uyarı kutusu olmadan** hesap yapılır | **2/2** | id 56 (`2.5` → k=3, N=159) ve id 60 (`2.4` → k=2, N=128) |
+| AJ-27 | Yuvarlama **en yakına, yarımda yukarı**dır — ceil değildir | **2/2** | id 60'ta `df1=1` (k=2); ceil olsaydı k=3, N=159 çıkardı |
 | AJ-26 | `α` kutusuna **harf yazılabilir**; sayısal olmayan girdi için ayrı mesaj yoktur, aralık hatasına katlanır | **1/1** | id 57 (`abc`) |
 
 ### Neden bu satırlar kıymetli
@@ -135,10 +136,12 @@ ikili kanıtı henüz yok. `[REA]` adayları bölüm 4.2'de.
   Alt sınırların tam değerleri (`1e-06`, `1e-07`) **denenmedi** — kapsam
   burada bitiyor, genelleme yapılmadı (H1-02'nin dersi).
 
-> **BELİRSİZ:** AJ-25'teki yuvarlama **yönü**. `2.5 → 3` hem yukarı yuvarlamayla
-> hem en yakına yuvarlamayla açıklanır. Ayırt edici vektör `groups = 2.4`
-> (ceil ⇒ N=159, en yakına ⇒ N=128). Motor şu an **en yakına yuvarlama**
-> uyguluyor ve bu seçim `core.py` içinde TODO olarak işaretli.
+> **ÇÖZÜLDÜ (id 60).** `groups = 2.4` → N=128, `df1 = 1`, yani k=2. Yukarı
+> yuvarlama olsaydı k=3 / N=159 çıkardı. Kural: en yakına yuvarlama, yarımda
+> yukarı (AJ-27). Motor bunu uyguluyor; `core.py`'deki TODO kaldırıldı.
+> Yan bulgu: id 60'ta λ tam sayı **8** olmasına rağmen `8.0000000` diye
+> 7 ondalıkla gösterildi — bölüm 2.4'teki gösterim tartışmasını a priori
+> tarafında destekler (karşı örnekler hâlâ post hoc'tan geliyor).
 
 ## 2.4 Gösterim biçimi — ESKİ İDDİA ÇÜRÜDÜ, ŞU AN BELİRSİZ
 
