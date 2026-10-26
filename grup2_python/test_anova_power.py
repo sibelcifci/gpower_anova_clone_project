@@ -69,11 +69,15 @@ class SpecTests(unittest.TestCase):
         # bandi kendi icinde cozuyor: guc hicbir N'de alfanin altina inemez
         # (id 43), dolayisiyla en kucuk uygun kat zaten hedefi saglar. Hata
         # atmak gizli vektorde bu bant varsa N'i hic uretmemek demekti.
-        for target in [.05,.01]:
-            with self.subTest(power=target):
-                sonuc = analyze(dict(mode="a_priori",f=.25,alpha=.05,power=target,groups=3))
-                self.assertEqual(sonuc["total_n"], 6)
-                self.assertGreaterEqual(sonuc["actual_power"], target)
+        # power == alpha gecerlidir (kural "greater than OR EQUAL").
+        sonuc = analyze(dict(mode="a_priori",f=.25,alpha=.05,power=.05,groups=3))
+        self.assertEqual(sonuc["total_n"], 6)
+        self.assertGreaterEqual(sonuc["actual_power"], .05)
+        # power < alpha ARTIK HATA. id 61 (v61.png): G*Power "Power must be
+        # greater than or equal to alpha." diyor ve bu kural tek yonlu ANOVA
+        # a priori yolunda tetikleniyor. Onceki surum N=6 donduruyordu.
+        with self.assertRaises(ValueError):
+            analyze(dict(mode="a_priori",f=.25,alpha=.05,power=.01,groups=3))
         with self.assertRaises(ValueError):
             analyze(dict(mode="a_priori",f=0,alpha=.05,power=.8,groups=3))
 

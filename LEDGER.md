@@ -240,7 +240,7 @@ aynı ikili. Taranan dize sayısı: **4138**.
 | REA-17 | AJ-24 — `There must be at least 2 groups.` | `1856916` (+ parçalı `1856964`) | **KANITLANDI** |
 | REA-18 | AJ-20 — alan adları ayrı bir dize tablosunda | `1852700`–`1852936` | **KANITLANDI** |
 | REA-04 | AJ-07 — kritik F **sınırlı iteratif aramayla** bulunuyor | `1849244`–`1849420` | **KANITLANDI** |
-| REA-19 | **YENİ** — `Power must be greater than or equal to alpha.` | `1856032` | **KANITLANDI** (davranış sınanmadı) |
+| REA-19 | **YENİ** — `Power must be greater than or equal to alpha.` | `1856032` | **KANITLANDI + davranışla doğrulandı** (id 61) |
 | REA-20 | **YENİ** — `is inside the prohibited range (` ikinci bir doğrulama kategorisi | `1855997` | **KANITLANDI** (hiç gözlenmedi) |
 | REA-21 | REA-06 adayı — `Sample size must be greater than or equal to ` | `1856080`, `1855836` | **KANITLANDI** (hangi yolda kullanıldığı açık değil) |
 | REA-11 | B-08 — kayan nokta tipi | `2123044` (`_isnan`), `2123378` (`_finite`), `1885224` (`Math overflow`) | **KISMEN** |
@@ -309,11 +309,21 @@ Ama dikkat: bir dizenin ikilide bulunması, o kuralın **tek yönlü ANOVA
 a priori yolunda tetiklendiğini kanıtlamaz**. G*Power çok sayıda test ailesi
 içerir ve bu metin başka bir aileye ait olabilir.
 
-> **Motor şu an bu kuralı uygulamıyor:** `power = 0.01, alpha = 0.05`
-> verildiğinde hata atmak yerine en küçük uygun N'i döndürüyor (bu seçim
-> `grup2_python/test_anova_power.py` içinde gerekçesiyle yazılı).
-> **Sınanması gereken vektör:** a priori, `f=0.25, alpha=0.05, power=0.01,
-> groups=3`. G*Power hata verirse motor da vermeli.
+**Sınandı ve doğrulandı (id 61, `v61.png`).** A priori `f=0.25, α=0.05,
+power=0.01, k=3` verildiğinde G*Power tam olarak bu metni gösteriyor ve bütün
+çıktı alanları `?` oluyor. Yani kural **tek yönlü ANOVA a priori yolunda
+gerçekten tetikleniyor**; dize başka bir test ailesine ait değilmiş.
+
+Motor güncellendi: `power < alpha` artık reddediliyor, `power == alpha`
+serbest (kural "greater than **or equal**" diyor). Önceki sürüm ikisini de
+kabul edip N=6 döndürüyordu — gizli vektörde bu bant olsaydı N uyuşmazdı.
+
+> **Yöntem notu.** Bu bulgu sıralamayı tersine çevirdi: önce ikilide kural
+> bulundu, sonra davranışla sınandı. Normal akış bunun tersi (gözle, sonra
+> ikilide ara). İki yönün de işe yaradığı görüldü — ama dizenin varlığı tek
+> başına yeterli sayılmadı, çünkü G*Power onlarca test ailesi içerir ve metin
+> başka bir aileye ait olabilirdi. Kanıt ile çıkarım arasındaki fark tam
+> olarak budur.
 
 #### REA-20 — hiç gözlemlemediğimiz ikinci doğrulama kategorisi
 

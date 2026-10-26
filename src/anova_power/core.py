@@ -139,11 +139,14 @@ def analyze(data):
     else:
         target = number(data, "power")
         _araliklari_dogrula(mode, effect, alpha, target)
-        # power <= alpha: SPEC bölüm 6 bu bandı BELİRSİZ bırakıyor, ama SPEC 3.4
-        # ("istenen gücü sağlayan en küçük uygun N") bandı kendi içinde çözüyor:
-        # güç hiçbir N'de alfanın altına inemediğinden (id 43) en küçük uygun
-        # kat zaten hedefi sağlar. Hata atmak yerine o değeri döndürüyoruz;
-        # aksi halde gizli vektörde bu bant varsa N hiç üretilmez.
+        # SPEC 6.8 / REA-19: G*Power "Power must be greater than or equal to
+        # alpha." der (ikilide 1856032) ve bu kural tek yönlü ANOVA a priori
+        # yolunda GERÇEKTEN tetikleniyor (id 61). Eşitlik serbesttir.
+        if target < alpha:
+            raise ValueError("power: alfadan küçük olamaz")
+        # NOT: power == alpha hâlâ geçerlidir ve en küçük uygun N'i döndürür;
+        # kâhinin kuralı "greater than OR EQUAL" diyor. Yalnızca power < alpha
+        # reddedilir. Önceki sürüm ikisini de kabul ediyordu (id 61 çürüttü).
         total_n = _en_kucuk_n(effect, alpha, groups, target)
         result = statistics(effect, alpha, groups, total_n)
         result["total_n"] = total_n

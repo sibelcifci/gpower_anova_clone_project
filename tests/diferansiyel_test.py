@@ -47,6 +47,7 @@ KURAL_ESLEME = [
     ("Alpha is outside",                 "alpha:"),
     ("Power is outside",                 "power:"),
     ("There must be at least 2 groups",  "En az 2 grup"),
+    ("Power must be greater than or equal to alpha", "alfadan küçük olamaz"),
 ]
 
 

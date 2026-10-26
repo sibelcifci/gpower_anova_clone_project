@@ -516,11 +516,36 @@ verirdi — yani **yarımda yukarı**.
 ayrı bir hata **yoktur**, aralık hatasına katlanır (id 57). Metin büyük
 olasılıkla `0` olarak ayrıştırılıyor — doğrulanmadı.
 
+### 6.8 Güç alfadan küçük olamaz — DOĞRULANDI (id 61)
+
+```gherkin
+  Scenario: A priori'de istenen güç alfadan küçük
+    Given a priori modda f=0.25, alpha=0.05, groups=3 verilir
+    And istenen güç 0.01 verilir
+    When hesap istenir
+    Then "Input error" kutusu çıkar
+    And mesaj "Power must be greater than or equal to alpha." olur
+    And altı çıktı alanının hepsi "?" gösterir
+
+  Scenario: Güç alfaya EŞİT olabilir
+    Given a priori modda f=0.25, alpha=0.05, power=0.05, groups=3 verilir
+    Then hesap yapılır
+    # Kural "greater than OR EQUAL" der; eşitlik serbesttir.
+```
+
+Bu kural önce **ikilide** bulundu (`LEDGER.md` REA-19, offset `1856032`),
+sonra **davranışla** doğrulandı (id 61). Sıralama önemli: dizenin varlığı tek
+başına yeterli değildi, çünkü G*Power çok sayıda test ailesi içerir ve metin
+başka bir aileye ait olabilirdi. Tetiklendiği ayrıca sınandı.
+
+Aralık kalıbını **kullanmaz**; `groups` gibi ayrı bir mesajdır.
+
 ### 6.7 Hâlâ bilinmeyenler
 
 | soru | durum |
 |---|---|
-| `power <= alpha` bandı (a priori) | BELİRSİZ — EKSIK_VAKALAR G-01…G-04 |
+| `power < alpha` bandı (a priori) | ✅ ÇÖZÜLDÜ — reddediliyor, bölüm 6.8, id 61 |
+| `is inside the prohibited range` mesajı hangi alanda çıkar | bilinmiyor — LEDGER REA-20 |
 | A priori'de grup başına minimum gözlem | BELİRSİZ — EKSIK_VAKALAR K-08 |
 | Alt sınırların tam değerleri (`f=1e-06`, `α=1e-07`) | denenmedi |
 | Post hoc'ta `power` alanı girdi değil, sınırı yok | doğrulandı (id 58, 59) |
