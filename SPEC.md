@@ -391,51 +391,124 @@ Feature: Gösterim biçimi
 
 ---
 
-## 6. Hâlâ doğrulanmamış sınır değerler
+## 6. Girdi sınırları — ARTIK DOĞRULANDI
+
+> Bu bölüm 2026-10-26'da **baştan yazıldı.** Önceki sürümü oracle verisi
+> olmadan yazılmıştı ve bir kuralı **yanlıştı**: "`groups = 2.5` hata üretir"
+> diyordu; G*Power hesabı yapıyor (id 56). Kanıt: id 45–59, görseller v45–v59.
+
+### 6.1 Kabul aralıkları
+
+G*Power üç alan için **tek kalıptan** üretilen bir hata verir:
+
+```
+"<Alan> is outside the admissible range (<alt>, <üst>)."
+```
+
+| alan | a priori | post hoc | kanıt |
+|---|---|---|---|
+| `Effect size f` | `(1e-06, 50)` | `(0, 50)` | id 45, 46 ↔ id 58 |
+| `α err prob` | `(1e-07, 1)` | `(1e-07, 1)` | id 47, 48, 49 ↔ id 59 |
+| `Power` | `(1e-07, 1)` | — (çıktıdır) | id 50, 51, 52 |
+
+**Üst sınır dahil değildir:** `α = 1` ve `Power = 1` reddedildi (id 48, 50).
+Alt sınırların tam değerleri (`f = 1e-06`, `α = 1e-07`) **denenmedi** — gösterim
+açık aralık olduğu için motor da açık kabul eder; bu bir varsayımdır.
 
 ```gherkin
-Feature: Doğrulanmamış girdi sınırları
+Feature: Kabul aralıkları
 
-  # Aşağıdakiler oracle verisinde DENENMEDİ. Bunlar CLI sözleşmesinin
-  # gereğidir, G*Power davranışının kopyası DEĞİLDİR.
-  # Gerçek davranış için EKSIK_VAKALAR.md bölüm 5'teki vektörler çalıştırılmalı.
-
-  Scenario Outline: Tanım kümesi dışındaki girdiler hata üretir
-    Given <alan> alanına <deger> verilir
-    When program çalıştırılır
-    Then çıktı yalnızca "error" alanını içerir
-    And çıkış kodu sıfırdan farklı olur
+  Scenario Outline: Aralık dışı girdi hata üretir, çıktı alanları "?" olur
+    Given mod <mod> seçilir
+    And <alan> alanına <deger> verilir
+    When hesap istenir
+    Then "Input error" kutusu çıkar
+    And altı çıktı alanının hepsi "?" gösterir
 
     Examples:
-      | alan   | deger | gerekçe                          |
-      | groups | 1     | df1 sıfır olur, F testi tanımsız |
-      | groups | 0     | grup sayısı pozitif olmalı       |
-      | groups | -3    | grup sayısı pozitif olmalı       |
-      | groups | 2.5   | grup sayısı tam sayı olmalı      |
-      | alpha  | 0     | alfa açık aralıkta olmalı        |
-      | alpha  | 1     | alfa açık aralıkta olmalı        |
-      | alpha  | -0.05 | alfa açık aralıkta olmalı        |
-      | f      | -0.25 | etki büyüklüğü negatif olamaz    |
-      | power  | 1     | güç birebir 1 olamaz             |
-      | power  | 0     | güç pozitif olmalı               |
-      | power  | 1.5   | güç 1'i aşamaz                   |
-
-  # NOT: "f = 0 hatadır" KURALI YOKTUR ve olmamalıdır.
-  # id 43 gösteriyor ki G*Power f = 0'ı kabul ediyor ve güç olarak alfayı
-  # döndürüyor. Motor da post hoc'ta aynısını yapmalıdır.
-
-  Scenario: A priori'de istenen güç alfadan küçük veya ona eşit
-    Given istenen güç alfaya eşit ya da ondan küçük verilir
-    Then davranış BELİRSİZDİR
-    # TODO: EKSIK_VAKALAR G-01 … G-04 çalıştırılacak
-
-  Scenario: A priori'de grup başına minimum gözlem sayısı
-    Given etki büyüklüğü çok büyüktür ve istenen güç en küçük örneklemde sağlanır
-    Then toplam örneklemin alt sınırı BELİRSİZDİR
-    # Post hoc'ta sınır biliniyor (N > k, bölüm 4.3) ama a priori'de bilinmiyor.
-    # TODO: EKSIK_VAKALAR K-08 çalıştırılacak
-    # TODO: REA ile doğrulanacak
+      | mod      | alan  | deger | id |
+      | a_priori | f     | 0     | 45 |
+      | a_priori | f     | -0.25 | 46 |
+      | a_priori | alpha | 0     | 47 |
+      | a_priori | alpha | 1     | 48 |
+      | a_priori | alpha | -0.05 | 49 |
+      | a_priori | power | 1     | 50 |
+      | a_priori | power | 0     | 51 |
+      | a_priori | power | 1.5   | 52 |
+      | post_hoc | f     | 60    | 58 |
+      | post_hoc | alpha | 0     | 59 |
 ```
+
+### 6.2 `f` alanının aralığı MODA BAĞLIDIR
+
+A priori alt sınırı `1e-06`, post hoc alt sınırı `0`'dır (id 45 ↔ id 58).
+Aynı alan, aynı testte, yalnızca analiz türü değiştiği için farklı doğrulanır.
+**Kılavuzda böyle bir ayrım yazmaz.**
+
+### 6.3 Gösterilen aralık ile gerçek davranış ÇELİŞİR (post hoc)
+
+Post hoc mesajı aralığı **açık** gösterir: `(0, 50)`. Buna rağmen id 43'te
+`f = 0` **kabul edilir** ve güç tam olarak α çıkar (`0.0500000`).
+
+```gherkin
+  Scenario: Post hoc f = 0 kabul edilir, mesajın dediğinin aksine
+    Given mod post_hoc ve f = 0 verilir
+    When hesap istenir
+    Then hata çıkmaz
+    And güç alfaya eşit olur   # id 43: alpha=0.05 -> 0.0500000
+```
+
+Motor **davranışı** izler, mesajı değil: post hoc'ta `0 <= f < 50`.
+
+### 6.4 Grup sayısı: ayrı bir mesaj kalıbı
+
+`groups < 2` için aralık kalıbı **kullanılmaz**; ayrı bir metin çıkar:
+
+```
+"There must be at least 2 groups."
+```
+
+id 53 (`groups=1`), id 54 (`groups=0`), id 55 (`groups=-3`) — üçünde de birebir
+aynı metin.
+
+### 6.5 Tam sayı olmayan grup sayısı SESSİZCE kabul edilir
+
+```gherkin
+  Scenario: groups = 2.5 hata vermez, hesap yapılır
+    Given a priori modda f=0.25, alpha=0.05, power=0.80 verilir
+    And groups alanına 2.5 yazılır
+    When hesap istenir
+    Then hata kutusu ÇIKMAZ
+    And uyarı kutusu da ÇIKMAZ
+    And sonuç k=3 ile birebir aynı olur   # id 56 = id 15/30
+    # lambda 9.9375000, critical F 3.0540042, df1 2, df2 156,
+    # total N 159, actual power 0.8048873
+```
+
+Bu, G*Power'ın **sessiz veri dönüşümü** yaptığı tek yerdir: `N`'in `k`'nın katı
+olmaması durumunda bir `Please note` kutusu gösterilirken (bölüm 4.2), burada
+hiçbir uyarı yoktur.
+
+> **BELİRSİZ — yuvarlama yönü.** `2.5 → 3` hem yukarı yuvarlamayla (ceil) hem
+> en yakına yuvarlamayla açıklanır. Ayırt edici vektör `groups = 2.4`:
+> ceil ise N=159, en yakına yuvarlama ise N=128 beklenir.
+> TODO: id 60 toplanacak.
+
+### 6.6 Sayısal olmayan metin ayrı mesaj almaz
+
+`α` kutusuna `abc` yazılabilir; `Calculate` basıldığında "geçersiz sayı" diye
+ayrı bir hata **yoktur**, aralık hatasına katlanır (id 57). Metin büyük
+olasılıkla `0` olarak ayrıştırılıyor — doğrulanmadı.
+
+### 6.7 Hâlâ bilinmeyenler
+
+| soru | durum |
+|---|---|
+| `power <= alpha` bandı (a priori) | BELİRSİZ — EKSIK_VAKALAR G-01…G-04 |
+| A priori'de grup başına minimum gözlem | BELİRSİZ — EKSIK_VAKALAR K-08 |
+| Alt sınırların tam değerleri (`f=1e-06`, `α=1e-07`) | denenmedi |
+| Post hoc'ta `power` alanı girdi değil, sınırı yok | doğrulandı (id 58, 59) |
+| `groups` üst sınırı | denenmedi |
 
 ---
 

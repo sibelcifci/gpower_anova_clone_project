@@ -13,12 +13,13 @@ Her iddia bir etiket taşır:
 > incelemesi gerektiriyor). Decompile/disassembly yapılmadı, ikili repoya konmadı.
 > Kanıtsız `[REA]` yazmak kural ihlalidir; TODO satırları bilerek TODO.
 
-**Kanıt tabanı:** `oracle/anova_oneway.csv` — **44 satır / 44 ekran görüntüsü**
+**Kanıt tabanı:** `oracle/anova_oneway.csv` — **59 satır / 59 ekran görüntüsü**
+(2026-10-26'da 15 satır eklendi: geçersiz girdi vektörleri, id 45–59, `oracle/X_TOPLAMA.md`)
 
 | mod | satır | benzersiz girdi vektörü |
 |---|---|---|
-| `a_priori` | 30 | 27 |
-| `post_hoc` | 14 (12'si çıktı üretti, 2'si hata) | 11 |
+| `a_priori` | 43 | 40 |
+| `post_hoc` | 16 (12'si çıktı üretti, 4'ü hata) | 13 |
 
 Çapraz kontrol: `tests/uyum_raporu.md` — a priori 30/30, post hoc 12/12 eşleşti.
 
@@ -107,6 +108,38 @@ AJ-12 yalnızca *aynı kurulumda tekrarlanabilirliği* gösterir;
 
 ---
 
+## 2.5 Girdi doğrulama — YENİ (id 45–59)
+
+2026-10-26'da toplanan 15 vektör. Hepsi `[AJAN]`: ekrandan okunan davranış,
+ikili kanıtı henüz yok. `[REA]` adayları bölüm 4.2'de.
+
+| # | iddia | tuttuğu satır | nasıl ölçüldü |
+|---|---|---|---|
+| AJ-20 | Aralık hataları **tek kalıptan** üretilir: `"<Alan> is outside the admissible range (<alt>, <üst>)."` | **10/10** | id 45–52, 58, 59 |
+| AJ-21 | `α` ve `Power` için aralık **`(1e-07, 1)`**; üst sınır **dahil değil** | **6/6** | id 47–52; `α=1` (id 48) ve `Power=1` (id 50) reddedildi |
+| AJ-22 | **`f` alanının aralığı moda bağlıdır:** a priori `(1e-06, 50)`, post hoc `(0, 50)` | **3/3** | id 45, 46 (a priori) ↔ id 58 (post hoc) |
+| AJ-23 | **Gösterilen aralık ile davranış çelişir:** post hoc mesajı `(0, 50)` der ama `f = 0` kabul edilir | **1 çelişki** | id 58 mesajı ↔ id 43 sonucu (güç = α = 0.0500000) |
+| AJ-24 | `groups < 2` aralık kalıbını **kullanmaz**, ayrı metin verir: `"There must be at least 2 groups."` | **3/3** | id 53 (k=1), 54 (k=0), 55 (k=−3) |
+| AJ-25 | **Tam sayı olmayan grup sayısı sessizce kabul edilir:** `groups = 2.5` hata ve **uyarı kutusu olmadan** `k=3` sonucunu verir | **1/1** | id 56 = id 15/30 ile birebir aynı çıktı (N=159, df1=2, df2=156, λ=9.9375000) |
+| AJ-26 | `α` kutusuna **harf yazılabilir**; sayısal olmayan girdi için ayrı mesaj yoktur, aralık hatasına katlanır | **1/1** | id 57 (`abc`) |
+
+### Neden bu satırlar kıymetli
+
+- **AJ-22 ve AJ-23 kılavuzda yazamaz.** Biri aynı alanın iki moda göre farklı
+  doğrulandığını, diğeri programın **kendi hata mesajıyla tutarsız** olduğunu
+  gösteriyor. İkincisi bir uygulama kusurudur; belgeye girmesi beklenmez.
+- **AJ-25 sessiz veri dönüşümüdür.** G*Power, `N`'in `k`'nın katı olmadığı
+  durumda kullanıcıyı `Please note` ile uyarır (AJ-14); burada ise hiç
+  uyarmaz. Aynı programda iki farklı politika.
+- **AJ-21'in yönü ölçüldü:** aralık gösterimi açık ve gerçekten açık.
+  Alt sınırların tam değerleri (`1e-06`, `1e-07`) **denenmedi** — kapsam
+  burada bitiyor, genelleme yapılmadı (H1-02'nin dersi).
+
+> **BELİRSİZ:** AJ-25'teki yuvarlama **yönü**. `2.5 → 3` hem yukarı yuvarlamayla
+> hem en yakına yuvarlamayla açıklanır. Ayırt edici vektör `groups = 2.4`
+> (ceil ⇒ N=159, en yakına ⇒ N=128). Motor şu an **en yakına yuvarlama**
+> uyguluyor ve bu seçim `core.py` içinde TODO olarak işaretli.
+
 ## 2.4 Gösterim biçimi — ESKİ İDDİA ÇÜRÜDÜ, ŞU AN BELİRSİZ
 
 Önceki sürümde "λ, kritik F ve güç alanları **daima** 7 ondalık basamakla
@@ -190,6 +223,25 @@ Kural gereği burada yalnızca **bayt offseti + kısa alıntı** vardır.
 | REA-06 | B-05 (a priori'de grup başına minimum gözlem sabiti) | — | TODO |
 | REA-09 | AJ-17 (`f = 0` özel durum mu) | — | TODO (kod akışı gerekir) |
 | REA-11 | B-08 (kayan nokta tipi) | — | TODO |
+
+### 4.2 Yeni `[REA]` adayları (id 45–59'dan)
+
+Aşağıdaki dizeler ekranda **birebir okundu**; ikilide aranmaları hâlinde
+doğrudan `[REA]` kanıtına dönüşürler. Araç hazır: `--ara` veya `--tara`.
+
+| id | aranacak dize | hangi iddiayı kanıtlar | durum |
+|---|---|---|---|
+| REA-15 | `is outside the admissible range` | AJ-20 — kalıp tek parça mı, çalışma anında mı birleşiyor (REA-08'deki gibi) | TODO |
+| REA-16 | `1e-06`, `1e-07`, `50` sabitleri | AJ-21/AJ-22 — sınırlar sabit mi, moda göre iki ayrı sabit mi | TODO |
+| REA-17 | `There must be at least 2 groups` | AJ-24 — ayrı doğrulama yolu | TODO |
+| REA-18 | `Effect size f`, `Alpha`, `Power` alan adları | AJ-20 — alan adı mesaja çalışma anında mı yerleştiriliyor | TODO |
+
+Çalıştırma:
+
+```
+python tools/rea_strings.py "<GPowerNT.exe yolu>" --ara "is outside the admissible range" --ara "There must be at least 2 groups"
+python tools/rea_strings.py "<GPowerNT.exe yolu>" --tara --en-fazla 40 > rea_kesif.md
+```
 
 ### REA-07 — hata metninin İKİ varyantı var
 

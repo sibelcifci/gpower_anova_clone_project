@@ -36,7 +36,40 @@ TOLERANS = 5e-7
 # veriyoruz ve hatanın gerçekten grup sayısı kuralından geldiğini doğruluyoruz;
 # aksi halde test yanlış sebeple "geçmiş" görünürdü.
 YER_TUTUCU_F = 0.25
-RED_BEKLENEN_METIN = "grup sayısından büyük olmalı"
+
+# Hata satırlarında reddin DOĞRU KURALDAN geldiğini doğrularız; yoksa test
+# yanlış sebeple "geçmiş" görünür. Soldaki, CSV `notlar` sütunundaki G*Power
+# mesajının bir parçası; sağdaki, motorun hata metninde aranan parça.
+# SPEC bölüm 6, id 45-59.
+KURAL_ESLEME = [
+    ("Sample size must be greater than", "grup sayısından büyük olmalı"),
+    ("Effect size f is outside",         "f:"),
+    ("Alpha is outside",                 "alpha:"),
+    ("Power is outside",                 "power:"),
+    ("There must be at least 2 groups",  "En az 2 grup"),
+]
+
+
+def beklenen_red_kurali(satir):
+    """Satırın notlarındaki G*Power mesajına karşılık gelen motor hata parçası."""
+    notlar = satir.get("notlar") or ""
+    for gpower_metni, motor_metni in KURAL_ESLEME:
+        if gpower_metni in notlar:
+            return motor_metni
+    return None
+
+
+def sayi_veya_ham(metin):
+    """CSV hücresini sayıya çevirir; çevrilemiyorsa HAM METNİ döndürür.
+
+    id 57'de `alpha` hücresi `abc`'dir: G*Power alana harf girilmesine izin
+    veriyor (SPEC 6.6). Motor da aynı ham değeri görmeli ki reddi gerçekten
+    kendi doğrulamasından gelsin, testin float() çağrısından değil.
+    """
+    try:
+        return float(metin)
+    except ValueError:
+        return metin
 
 
 def satirlari_oku(yol):
@@ -47,9 +80,10 @@ def satirlari_oku(yol):
 def motoru_cagir(satir):
     """CSV satırını motorun girdisine çevirir ve çağırır."""
     ham_f = satir["f"]
-    ortak = dict(f=YER_TUTUCU_F if ham_f == "" else float(ham_f),
-                 alpha=float(satir["alpha"]),
-                 groups=int(satir["groups"]))
+    ortak = dict(f=YER_TUTUCU_F if ham_f == "" else sayi_veya_ham(ham_f),
+                 alpha=sayi_veya_ham(satir["alpha"]),
+                 # groups tam sayı OLMAYABİLİR (id 56: 2.5) — SPEC 6.5.
+                 groups=sayi_veya_ham(satir["groups"]))
     if satir["mod"] == "a_priori":
         return analyze(dict(mode="a_priori", power=float(satir["power"]), **ortak))
     return analyze(dict(mode="post_hoc", total_n=int(satir["total_n"]), **ortak))
@@ -70,7 +104,7 @@ def satiri_karsilastir(satir, sonuc):
         if sapma > TOLERANS:
             farklar.append(f"{ad}: oracle={beklenen} motor={sonuc[ad]} (d={sapma:.1e})")
     if satir["mod"] == "post_hoc":
-        kat_degil = int(satir["total_n"]) % int(satir["groups"]) != 0
+        kat_degil = int(satir["total_n"]) % int(float(satir["groups"])) != 0
         if kat_degil != ("warning" in sonuc):
             farklar.append(
                 f"warning: N%k!=0 oldugunda beklenen={kat_degil} motor={'warning' in sonuc}")
@@ -93,9 +127,10 @@ def main():
         try:
             sonuc = motoru_cagir(satir)
         except ValueError as hata:
-            if hata_bekleniyor and RED_BEKLENEN_METIN in str(hata):
+            kural = beklenen_red_kurali(satir)
+            if hata_bekleniyor and kural and kural in str(hata):
                 dogru_red += 1
-                print(f"{rid:>3}  {satir['mod']:9}  N<=k KURALIYLA REDDEDILDI -> {hata}")
+                print(f"{rid:>3}  {satir['mod']:9}  DOGRU KURALLA REDDEDILDI -> {hata}")
             elif hata_bekleniyor:
                 yanlis_red += 1
                 sorunlar.append((rid, f"red dogru kuraldan gelmedi: {hata}"))

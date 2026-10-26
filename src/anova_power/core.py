@@ -14,6 +14,25 @@ from scipy.stats import f as central_f, ncf
 
 MAX_N = 100_000_000  # Uygulama kaynak sınırı; G*Power kuralı değildir.
 
+# --- Kabul aralıkları (SPEC 6.1) -------------------------------------------
+# Kâhinden doğrudan okundu: "<Alan> is outside the admissible range (a, b)."
+# id 45-59, görseller v45-v59. Üst sınırların dahil olmadığı id 48 ve id 50
+# ile kanıtlandı; alt sınırların tam değerleri denenmedi (SPEC 6.1 notu).
+F_UST = 50.0
+F_ALT_A_PRIORI = 1e-06        # id 45: f=0 reddedildi
+F_ALT_POST_HOC = 0.0          # id 58 mesajı (0, 50) der; id 43 f=0'ı KABUL eder
+ALFA_ALT, ALFA_UST = 1e-07, 1.0
+GUC_ALT, GUC_UST = 1e-07, 1.0
+
+# SPEC 6.5 — tam sayı olmayan grup sayısı sessizce tam sayıya çevrilir (id 56).
+# 2.5 -> 3 gözlemi hem ceil'i hem "en yakına yuvarlama"yı doğruluyor; ayırt
+# edilmedi. Burada en yakına yuvarlama (yarımda yukarı) seçildi; ayırt edici
+# vektör (groups=2.4) toplanınca bu tek satır güncellenecek.
+# TODO: SPEC 6.5, id 60 bekleniyor.
+def _grup_sayisi(ham):
+    """Grup sayısını tam sayıya çevirir (SPEC 6.5). Yuvarlama yönü BELİRSİZ."""
+    return int(math.floor(ham + 0.5))
+
 
 def number(data, key, integer=False):
     value = data.get(key)
@@ -28,6 +47,25 @@ def number(data, key, integer=False):
     if integer and (int(value) != value):
         raise ValueError(f"{key}: tam sayı gerekli")
     return int(value) if integer else float(value)
+
+
+def _araliklari_dogrula(mode, effect, alpha, target=None):
+    """SPEC 6.1-6.4: G*Power'ın kabul aralıklarını birebir uygular.
+
+    `f` alanının alt sınırı MODA BAĞLIDIR (SPEC 6.2): a priori'de 1e-06,
+    post hoc'ta 0. Post hoc'ta sınır **kapalı** alınır çünkü gösterilen
+    aralık (0, 50) olmasına rağmen id 43 f=0'ı kabul eder (SPEC 6.3) —
+    davranış, mesaja göre önceliklidir.
+    """
+    if mode == "a_priori":
+        if not F_ALT_A_PRIORI < effect < F_UST:
+            raise ValueError(f"f: ({F_ALT_A_PRIORI:g}, {F_UST:g}) aralığında olmalı")
+    elif not F_ALT_POST_HOC <= effect < F_UST:
+        raise ValueError(f"f: [{F_ALT_POST_HOC:g}, {F_UST:g}) aralığında olmalı")
+    if not ALFA_ALT < alpha < ALFA_UST:
+        raise ValueError(f"alpha: ({ALFA_ALT:g}, {ALFA_UST:g}) aralığında olmalı")
+    if target is not None and not GUC_ALT < target < GUC_UST:
+        raise ValueError(f"power: ({GUC_ALT:g}, {GUC_UST:g}) aralığında olmalı")
 
 
 def statistics(effect, alpha, groups, total_n):
@@ -81,12 +119,15 @@ def analyze(data):
         raise ValueError("Bilinmeyen veya bu moda ait olmayan alan var")
     effect = number(data, "f")
     alpha = number(data, "alpha")
-    groups = number(data, "groups", True)
-    if effect < 0 or not 0 < alpha < 1 or groups < 2:
-        raise ValueError("f >= 0, 0 < alpha < 1 ve groups >= 2 gerekli")
+    # SPEC 6.5: tam sayı olmayan grup sayısı reddedilmez, çevrilir (id 56).
+    groups = _grup_sayisi(number(data, "groups"))
+    if groups < 2:
+        # SPEC 6.4: G*Power burada aralık kalıbını değil ayrı bir metin kullanır.
+        raise ValueError("En az 2 grup olmalı")
     if groups >= MAX_N:
         raise ValueError("groups uygulamanın kaynak sınırını aşıyor")
     if mode == "post_hoc":
+        _araliklari_dogrula(mode, effect, alpha)
         total_n = number(data, "total_n", True)
         if total_n <= groups:
             raise ValueError("total_n grup sayısından büyük olmalı")
@@ -97,10 +138,7 @@ def analyze(data):
             result["warning"] = "Toplam N grup sayısının katı değildir; analiz ortalama grup büyüklüğüne dayanır."
     else:
         target = number(data, "power")
-        if not 0 < target < 1:
-            raise ValueError("power: 0 ile 1 arasında olmalı")
-        if effect == 0:
-            raise ValueError("f=0 iken alpha üzerindeki hedef güce sonlu N ile ulaşılamaz")
+        _araliklari_dogrula(mode, effect, alpha, target)
         # power <= alpha: SPEC bölüm 6 bu bandı BELİRSİZ bırakıyor, ama SPEC 3.4
         # ("istenen gücü sağlayan en küçük uygun N") bandı kendi içinde çözüyor:
         # güç hiçbir N'de alfanın altına inemediğinden (id 43) en küçük uygun

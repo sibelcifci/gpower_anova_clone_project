@@ -48,7 +48,7 @@ class SpecTests(unittest.TestCase):
     def test_invalid_inputs(self):
         base = dict(mode="post_hoc", f=.25, alpha=.05, total_n=150, groups=3)
         changes = [{"total_n":3},{"total_n":2},{"groups":1},{"groups":0},
-                   {"groups":-3},{"groups":2.5},{"groups":True},
+                   {"groups":-3},{"groups":True},
                    {"alpha":0},{"alpha":1},{"alpha":-.05},{"f":-.25},
                    {"f":float("nan")},{"alpha":float("inf")},{"extra":1}]
         for change in changes:
@@ -57,6 +57,13 @@ class SpecTests(unittest.TestCase):
         for target in [0,1,1.5]:
             with self.assertRaises(ValueError):
                 analyze(dict(mode="a_priori",f=.25,alpha=.05,power=target,groups=3))
+        # groups=2.5 ARTIK GECERSIZ DEGIL. Eski SPEC bolum 6 "hata uretir"
+        # diyordu; oracle id 56 (gorsel v56.png) bunu curuttu: G*Power 2.5'i
+        # sessizce kabul edip k=3 sonucunu veriyor, uyari kutusu dahi cikmiyor.
+        # Beklentiyi kahine uydurduk; testi gecsin diye degil (SPEC 6.5).
+        kesirli = analyze(dict(mode="post_hoc",f=.25,alpha=.05,total_n=150,groups=2.5))
+        self.assertEqual(kesirli["df1"], 2)   # df1 = k-1 => k = 3
+        self.assertEqual(kesirli["df2"], 147)
         # power <= alpha artik hata DEGIL. SPEC bolum 6 bu bandi BELIRSIZ
         # birakiyor, ama SPEC 3.4 ("istenen gucu saglayan en kucuk uygun N")
         # bandi kendi icinde cozuyor: guc hicbir N'de alfanin altina inemez
@@ -86,7 +93,9 @@ class SpecTests(unittest.TestCase):
     def test_equality_policy_and_minimum(self):
         target = statistics(.25,.05,3,159)["actual_power"]
         self.assertEqual(analyze(dict(mode="a_priori",f=.25,alpha=.05,power=target,groups=3))["total_n"],159)
-        self.assertEqual(analyze(dict(mode="a_priori",f=100,alpha=.05,power=.8,groups=3))["total_n"],6)
+        # f=100 idi; kabul araliginin ust siniri 50 oldugu icin (id 45/58)
+        # aralik icinde kalan ve yine en kucuk N'i veren bir deger secildi.
+        self.assertEqual(analyze(dict(mode="a_priori",f=49,alpha=.05,power=.8,groups=3))["total_n"],6)
 
 
 if __name__ == "__main__":
