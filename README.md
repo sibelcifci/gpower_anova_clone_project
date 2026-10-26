@@ -270,7 +270,11 @@ python tools/rea_strings.py "<GPowerNT.exe yolu>"
 iddialar (REA-01, REA-02, REA-03, REA-09) bu araçla **kanıtlanamaz** ve bilerek
 TODO bırakılmıştır — Ghidra ile ileri inceleme gerekir.
 
-_(ödev gereği ekran görüntüsü: `docs/rea_kontrol.png` — eklenecek)_
+Aracın tam çıktısı repoda: **`docs/rea_kontrol.md`** — ikilinin boyutu ve
+SHA-256'sı, mesaj parçalarının bayt offsetleri ve aranan dizelerin konumları.
+REA-19'un dayanağı olan `Power must be greater than or equal to alpha.` dizesi
+offset `1856032`'de bulunur; kural daha sonra G*Power'da tetiklenerek
+davranışla da doğrulanmıştır (oracle id 61, `v61.png`).
 
 ## Sürüm Bilgisi
 
