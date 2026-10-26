@@ -7,6 +7,7 @@ offset + kısa alıntı yazar, decompile/disassembly çıktısı üretmez
 Kullanım:
     python tools/rea_strings.py "C:\...\GPowerNT.exe"
     python tools/rea_strings.py "...\GPowerNT.exe" --ara "average group size"
+    python tools/rea_strings.py "...\GPowerNT.exe" --tara > rea_kesif.md
 """
 import argparse
 import hashlib
@@ -40,6 +41,79 @@ YORDAM = [
     "BinomialDist-Quantile: answer below lower search bound",
     "BinomialDist-Quantile: answer above upper search bound",
 ]
+
+# --- KESIF MODU (--tara) ---------------------------------------------------
+# Bilinen metni aramak yerine ikilideki TUM dizeleri tarar ve desene uyanlari
+# listeler. Amaci LEDGER.md'deki TODO kalan REA satirlarini kapatmak: aranacak
+# metni tahmin etmek gerekmez, ikili kendi sozlugunu gosterir.
+#
+# Her desen bir REA satirina baglidir; eslesme BULUNMAMASI da bir bulgudur
+# (ornegin hicbir "search bound" dizesi yoksa, kuantil kapali formdur).
+KESIF = {
+    "Sayısal yordam adları ve arama sınırları (REA-03 / REA-04 / REA-05)":
+        "[A-Za-z]{2,}Dist-[A-Za-z ]{3,}|search bound|quantile|iteration|"
+        "converg|tolerance|epsilon|bisect|newton",
+    "Kısıt ve doğrulama mesajları (REA-02 / REA-06)":
+        "must be|multiple of|greater or equal|at least|be an integer|"
+        "number of groups|per group|group size",
+    "Nonsantralite ve etki büyüklüğü sözlüğü (REA-01 / REA-09)":
+        "noncentral|non-central|noncentrality|lambda|effect size|"
+        "variance explained|partial eta",
+    "Kayan nokta tipi ipuçları (REA-11)":
+        "long double|extended|float80|denormal|_fpreset|"
+        "overflow|underflow|"
+        # NAN/INF/FPU buyuk harfe duyarli: aksi halde "trustInfo" gibi
+        # alakasiz dizeler yanlis pozitif veriyor (python.exe uzerinde gorulduy).
+        "(?-i:NAN|INF(?![A-Z])|FPU|isnan|_finite)",
+}
+
+# Yazdirilabilir ASCII araligi: bosluk (0x20) ile tilde (0x7e) arasi.
+# Kacis dizisi yerine karakterlerin kendisi yazildi.
+YAZDIRILABILIR = b"[ -~]"
+SIFIR = bytes([0])
+
+
+def dizeler(veri, en_az=6):
+    """Ikilideki yazdirilabilir dizeleri (kodlama, offset, metin) olarak uretir.
+
+    ASCII ve UTF-16LE ayri taranir; G*Power mesajlarinin bir kismi ascii,
+    bir kismi utf16 (bkz. REA-07'nin iki varyanti).
+    """
+    tekrar = b"{%d,}" % en_az
+    for m in re.finditer(YAZDIRILABILIR + tekrar, veri):
+        yield "ascii", m.start(), m.group().decode("latin-1")
+    for m in re.finditer(b"(?:" + YAZDIRILABILIR + SIFIR + b")" + tekrar, veri):
+        yield "utf16", m.start(), m.group().decode("utf-16-le", "replace")
+
+
+def tara(veri, en_fazla=25):
+    """KESIF desenlerine uyan dizeleri tabloya doker."""
+    havuz = list(dizeler(veri))
+    print("")
+    print("## Keşif taraması")
+    print("")
+    print("Taranan dize: %d" % len(havuz))
+    for baslik, desen in KESIF.items():
+        kural = re.compile(desen, re.IGNORECASE)
+        gorulen, vurus = set(), []
+        for kodlama, offset, metin in havuz:
+            if kural.search(metin) and metin not in gorulen:
+                gorulen.add(metin)
+                vurus.append((kodlama, offset, metin))
+        print("")
+        print("### " + baslik)
+        print("")
+        if not vurus:
+            print("**Eşleşme yok.** (Yokluk da bulgudur — LEDGER'a böyle yazılır.)")
+            continue
+        print("Toplam %d benzersiz dize; ilk %d tanesi:"
+              % (len(vurus), min(en_fazla, len(vurus))))
+        print("")
+        print("| kodlama | bayt offseti | dize |")
+        print("|---|---|---|")
+        for kodlama, offset, metin in vurus[:en_fazla]:
+            kisa = re.sub("[^ -~]+", "|", metin)[:70]
+            print("| %s | `%d` | `%s` |" % (kodlama, offset, kisa))
 
 
 def bul(veri, metin):
@@ -82,6 +156,10 @@ def main():
     ayirici.add_argument("ikili", help="GPowerNT.exe yolu (repoya konmaz)")
     ayirici.add_argument("--ara", action="append", default=[],
                          help="ek olarak aranacak metin; birden çok kez verilebilir")
+    ayirici.add_argument("--tara", action="store_true",
+                         help="keşif modu: ikilideki tüm dizeleri desenlere göre tarar")
+    ayirici.add_argument("--en-fazla", type=int, default=25, dest="en_fazla",
+                         help="keşif modunda desen başına yazılacak satır sayısı")
     arg = ayirici.parse_args()
 
     try:
@@ -103,6 +181,8 @@ def main():
     tablo(veri, "Sayısal yordam ipuçları (REA-04 / REA-05)", YORDAM)
     if arg.ara:
         tablo(veri, "Ek arama", arg.ara)
+    if arg.tara:
+        tara(veri, arg.en_fazla)
     return 0
 
 
