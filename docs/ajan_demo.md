@@ -242,7 +242,15 @@ bu, oturumu yeniden açmak (ya da MCP bağlantısını yenilemek) demektir.
 Tek motor mimarisi kodu tek yerde tutar ama **çalışan süreci kendiliğinden
 tazelemez**.
 
-> **TODO:** Sunucu yeniden başlatıldıktan sonra 3. çağrı tekrarlanmalı ve
-> `{"error":"power: alfadan küçük olamaz"}` döndüğü doğrulanmalıdır. Bu
-> belgede doğrulanmış gibi gösterilmiyor, çünkü doğrulanmadı.
+**Aynı oturumda tekrar denendi (2026-10-26):** çağrı birebir yinelendi,
+sonuç değişmedi — yine `total_n: 6`. Bu, tanıyı **güçlendiriyor**: sorun
+geçici bir aksaklık değil, sürecin belleğindeki modülün eskiliği. Kod
+diskte doğru (CLI aynı anda hata döndürüyor), süreç ise oturum boyunca
+aynı kalıyor.
+
+> **TODO (kapatılmadı):** Sunucu yeniden başlatıldıktan sonra 3. çağrı
+> tekrarlanmalı ve `{"error":"power: alfadan küçük olamaz"}` döndüğü
+> doğrulanmalıdır. Claude Code'da bu, oturumu kapatıp yeniden açmak demek;
+> bu belgeyi yazan oturumun kendisi sonlanacağı için yapılmadı.
+> **Bu belgede doğrulanmış gibi gösterilmiyor, çünkü doğrulanmadı.**
 
