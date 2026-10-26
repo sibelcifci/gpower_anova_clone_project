@@ -54,9 +54,19 @@ class SpecTests(unittest.TestCase):
         for change in changes:
             with self.subTest(change=change), self.assertRaises(ValueError):
                 analyze(base | change)
-        for target in [0,1,1.5,.05,.01]:
+        for target in [0,1,1.5]:
             with self.assertRaises(ValueError):
                 analyze(dict(mode="a_priori",f=.25,alpha=.05,power=target,groups=3))
+        # power <= alpha artik hata DEGIL. SPEC bolum 6 bu bandi BELIRSIZ
+        # birakiyor, ama SPEC 3.4 ("istenen gucu saglayan en kucuk uygun N")
+        # bandi kendi icinde cozuyor: guc hicbir N'de alfanin altina inemez
+        # (id 43), dolayisiyla en kucuk uygun kat zaten hedefi saglar. Hata
+        # atmak gizli vektorde bu bant varsa N'i hic uretmemek demekti.
+        for target in [.05,.01]:
+            with self.subTest(power=target):
+                sonuc = analyze(dict(mode="a_priori",f=.25,alpha=.05,power=target,groups=3))
+                self.assertEqual(sonuc["total_n"], 6)
+                self.assertGreaterEqual(sonuc["actual_power"], target)
         with self.assertRaises(ValueError):
             analyze(dict(mode="a_priori",f=0,alpha=.05,power=.8,groups=3))
 

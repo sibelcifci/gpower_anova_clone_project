@@ -8,9 +8,10 @@ Her iddia bir etiket taşır:
 | `[AJAN]` | Ajanın oracle verisinden çıkarımı — **binary kanıtı yok** | yok |
 | `[REA]` | İkili (binary) incelemesiyle kanıtlanmış | **var** |
 
-> **Bu oturumda hiçbir `[REA]` satırı doldurulmamıştır.** REA aracı çalıştırılmadı,
-> `GPower.exe` açılmadı. `[REA]` tablosu boş şablon olarak bırakılmıştır.
-> Kanıtsız `[REA]` yazmak kural ihlalidir.
+> **Oturum 3 (REA) yapıldı.** `tools/rea_strings.py` ile `GPowerNT.exe` üzerinde
+> dize araması çalıştırıldı: 5 `[REA]` satırı kanıtlandı, 8'i TODO kaldı (kod akışı
+> incelemesi gerektiriyor). Decompile/disassembly yapılmadı, ikili repoya konmadı.
+> Kanıtsız `[REA]` yazmak kural ihlalidir; TODO satırları bilerek TODO.
 
 **Kanıt tabanı:** `oracle/anova_oneway.csv` — **44 satır / 44 ekran görüntüsü**
 
@@ -154,35 +155,156 @@ Ayırt edici iki vektör `EKSIK_VAKALAR.md` → bölüm 10'da.
 | B-06 | Post hoc'ta N, k'nın katı değilken df2 | **ÇÖZÜLDÜ** — `df2 = N − k`, hesap değişmiyor (AJ-15) |
 | B-07 | Girdi alanlarının kabul ettiği basamak sayısı / iç yuvarlama | hâlâ bilinmiyor |
 | B-08 | Sayıların iç gösterimi (double mu, long double mu) | yalnızca REA ile görülebilir |
-| B-09 | **YENİ:** ondalık gösterim kuralı (bölüm 2.4) | hâlâ bilinmiyor |
-| B-10 | **YENİ:** `Input error` ile `Please note` kutularının ayrım ölçütü | kısmen: biri hesabı durduruyor, diğeri durdurmuyor; tam kural bilinmiyor |
+| B-09 | ondalık gösterim kuralı (bölüm 2.4) | **KISMEN ÇÖZÜLDÜ** — `%.7f` ve `%.5g` ikilide bulundu (REA-10); seçim koşulu açık |
+| B-10 | `Input error` ile `Please note` kutularının ayrım ölçütü | **ÇÖZÜLDÜ** — sabit başlık kümesi, çağıran seçiyor (REA-12) |
 
 ---
 
-## 4. `[REA]` — ikili inceleme kanıtı (BOŞ ŞABLON)
+## 4. `[REA]` — ikili inceleme kanıtı
 
-Bu tablo kasten boştur. Decompile çıktısı bu dosyaya **konmayacak**;
-yalnızca kısa alıntı + fonksiyon adresi yazılacaktır.
+**Araç:** `tools/rea_strings.py` — dize araması. Decompile/disassembly **yapılmaz**.
+**İkili:** `GPowerNT.exe` (dikkat: dosya adı `GPower.exe` **değil**), 2.287.616 bayt, 32-bit MSVC.
+**SHA-256:** `c63e6a133eb6372932f810c08cc33dc35a06d1ddb658f897bd6c34a754efc812`
 
-| id | iddia | fonksiyon adresi / dize ref | alıntı | durum |
-|---|---|---|---|---|
-| REA-01 | AJ-03 (`λ = f² · N`) motorda böyle hesaplanıyor | | | TODO |
-| REA-02 | AJ-04 (a priori'de N, k'nın katına yuvarlanıyor) | | | TODO |
-| REA-03 | AJ-05 (en küçük N araması) — arama mı, kapalı form mu | | | TODO |
-| REA-04 | AJ-07 (kritik F yordamı) | | | TODO |
-| REA-05 | AJ-08 (merkezî olmayan F kuyruk olasılığı yordamı) | | | TODO |
-| REA-06 | B-05 (a priori'de grup başına minimum gözlem sabiti) | | | TODO |
-| REA-07 | AJ-16 — `"Sample size must be greater than the number of groups"` dizesi | **dize araması: bu metin** | | TODO |
-| REA-08 | AJ-14/AJ-15 — `"not a multiple of the number of groups"` dizesi ve sonrasındaki dal | **dize araması: bu metin** | | TODO |
-| REA-09 | AJ-17 (`f = 0` özel durumu mu, yoksa formülün doğal sonucu mu) | | | TODO |
-| REA-10 | B-09 (sayı biçimlendirme yordamı) | | | TODO |
-| REA-11 | B-08 (kayan nokta tipi ve yakınsama toleransı) | | | TODO |
+İkili repoda **yok** (`.gitignore`). Tablo yeniden üretilebilir:
 
-> REA-07 ve REA-08 için **somut başlangıç noktası var**: iki hata/uyarı
-> metninin tam İngilizce hâli elimizde. İkilide dize araması yapıp bu
-> metinlere ulaşan dalı bulmak, REA'ya girmenin en kolay yolu.
+```
+python tools/rea_strings.py "<GPowerNT.exe yolu>"
+```
+
+Kural gereği burada yalnızca **bayt offseti + kısa alıntı** vardır.
+
+| id | iddia | offset (kodlama) | durum |
+|---|---|---|---|
+| REA-07 | AJ-16 — `N <= k` hata metni | `1856161`, `1856400` (ascii); `1907320` (utf16) | **KANITLANDI** |
+| REA-08 | AJ-14/AJ-15 — `Please note` uyarı metni | `1856476`–`1856584` (ascii, 5 parça) | **KANITLANDI** |
+| REA-10 | B-09 — sayı biçimleme yordamı | `1846000`–`1846016`, `1943636` | **KISMEN** |
+| REA-12 | B-10 — diyalog başlığı ayrımı | `1951204`–`1951488` (utf16) | **KANITLANDI** |
+| REA-13 | REA-04/05 — kuantil yordamının biçimi | `1846132`–`1846240` (ascii) | **KANITLANDI (dolaylı)** |
+| REA-01 | AJ-03 (`lambda = f^2 * N`) motorda böyle hesaplanıyor | — | TODO (kod akışı gerekir) |
+| REA-02 | AJ-04 (a priori'de N, k'nın katına yuvarlanıyor) | — | TODO (kod akışı gerekir) |
+| REA-03 | AJ-05 (en küçük N araması) — arama mı, kapalı form mu | — | TODO (kod akışı gerekir) |
+| REA-04 | AJ-07 (kritik F yordamı) | kısmen REA-13 | TODO |
+| REA-05 | AJ-08 (merkezî olmayan F kuyruk olasılığı) | kısmen REA-13 | TODO |
+| REA-06 | B-05 (a priori'de grup başına minimum gözlem sabiti) | — | TODO |
+| REA-09 | AJ-17 (`f = 0` özel durum mu) | — | TODO (kod akışı gerekir) |
+| REA-11 | B-08 (kayan nokta tipi) | — | TODO |
+
+### REA-07 — hata metninin İKİ varyantı var
+
+| offset | kodlama | alıntı |
+|---|---|---|
+| `1856161` | ascii | `Sample size must be greater than` |
+| `1856400` | ascii | `Total sample size must be greater than` |
+| `1856536` | ascii | `the number of groups (` |
+| `1907320` | utf16 | `The total sample size must be greater than the number of groups` |
+| `1896904` | utf16 | `The size of each group must be greater or equal 1` |
+
+Ana pencere metni **birleştirmeli**: `Sample size must be greater than` +
+` the number of groups (` + k + `)`. id 37/38'de ekrandan okunan
+`Sample size must be greater than the number of groups (3).` metni bununla
+**birebir doğrulandı** — CSV kaydı doğru, okuma hatası yok.
+
+UTF-16 varyantı (`1907320`) sabittir ve komşu dizelerine göre farklı bir
+diyaloğa (etki büyüklüğü paneli) aittir. **Aynı kısıt için iki ayrı metin**
+bulunması kılavuzda yazmayan bir uygulama ayrıntısıdır.
+
+### REA-08 — `Please note` mesajı çalışma anında birleştiriliyor
+
+| offset | parça |
+|---|---|
+| `1856584` | `The total sample size (` |
+| `1856560` | `) is not a multiple of` |
+| `1856536` | `the number of groups (` |
+| `1856512` | `). The analysis was ` |
+| `1856476` | `based on the average group size.` |
+
+Beş sabit, **~110 bayt içinde bitişik** bir dize tablosunda. Tam mesaj ikilide
+**tek parça halinde yoktur**; bu yüzden tam metin araması sonuç vermez.
+Bu tablonun önceki sürümü "dize araması: bu metin" diyordu — o yöntem
+başarısız olurdu; yöntemin kendisi düzeltildi.
+
+Bulgu **AJ-15'i güçlendirir**: `based on the average group size.` bağımsız bir
+metin sabitidir, hesap yoluna giren bir parametre değildir. Uyarı metni
+gerçekten yalnızca açıklama.
+
+### REA-10 — biçimleme: kısmen çözüldü, seçim kuralı hâlâ açık
+
+Bitişik format tablosu; hemen ardından `Input error (illegal character?)`
+(`1846036`). Bu blok sayı ayrıştırma/biçimleme modülü:
+
+| offset | format |
+|---|---|
+| `1846000` | `%ld` |
+| `1846004` | `%.16g` |
+| `1846012` | `%.f` |
+| `1846016` | `%.5g` |
+
+Başka yerlerde: `%.7f` -> `1943636` (utf16), `%.7g` -> `1925748`,
+`%.6g` -> `1872531`, `%.15g` -> `1886544`.
+**Bulunmayanlar:** `%.6f`, `%.5f`, `%.3f`, `%.0f`.
+
+**Kanıtlanan:** ekrandaki 7 ondalıklı gösterim (`0.8048873`, `9.9375000`,
+`17.5000000`) `%.7f` ile uyumludur ve bu dize ikilide **mevcuttur**. Tam sayı
+alanlar (`Total sample size`, `df1`, `df2`) `%.f` / `%ld` ile uyumludur.
+Bölüm 2.4'teki üç karşı örnek (lambda `0`, lambda `120`, kritik F `199.5`)
+`%.5g` çıktısıyla **birebir** uyumludur.
+
+**Kanıtlanmayan:** `%.7f` ile `%.5g` arasında **seçimi yapan koşul**. Dize
+araması dal koşulunu göstermez; bunun için kod akışı incelemesi gerekir.
+B-09 bu yüzden "kısmen" kalıyor — ama artık iki *hipotez* yerine iki *gerçek
+format dizesi* arasında seçim aranıyor.
+
+### REA-12 — B-10 ÇÖZÜLDÜ: başlıklar sabit bir küme
+
+| offset (utf16) | başlık |
+|---|---|
+| `1951204` | `Input error` |
+| `1951228` | `Please note` |
+| `1951280` | `Interruption` |
+| `1951488` | `Internal math error` |
+
+Dördü bitişik. `Input error` ile `Please note` ayrımı hesabın durup durmasının
+bir *sonucu* değildir; çağıran taraf hangi başlık sabitini seçtiğine göre
+kutuyu kurar. B-10 kapandı.
+
+### REA-13 — kuantil hesabı sınırlı iteratif arama
+
+| offset (ascii) | dize |
+|---|---|
+| `1846132` | `BinomialDist-Quantile: input parameter out of range` |
+| `1846184` | `BinomialDist-Quantile: answer below lower search bound` |
+| `1846240` | `BinomialDist-Quantile: answer above upper search bound` |
+
+`lower/upper search bound` ifadeleri **kapalı form değil, alt/üst sınırlı
+iteratif arama** anlamına gelir. Bu dizeler binom dağılımına aittir; **F
+kuantili için aynı altyapının kullanıldığı kanıtlanmadı.** Ancak aynı modülde
+(`1846000` format tablosuyla komşu) durmaları, dağılım yordamlarının ortak bir
+arama iskeleti paylaştığına dair güçlü işarettir.
 
 ---
+
+## 4.1 Kılavuzda OLMAYAN davranışlar (Kural 1)
+
+Ödev "kılavuzda yazanı değil, kılavuzda OLMAYAN davranışı bulun" diyor.
+Dize aramasıyla ortaya çıkan, kılavuzda bulunmayacak uygulama ayrıntıları:
+
+| # | bulgu | kanıt |
+|---|---|---|
+| U-01 | Uyarı/hata mesajları **çalışma anında parçalardan birleştiriliyor** | REA-08 |
+| U-02 | Aynı kısıt için **iki ayrı metin varyantı** (ana pencere birleştirmeli, diyalog sabit) | REA-07 |
+| U-03 | Etki büyüklüğü diyaloğu ile ana pencere arasında **senkron uyarısı**: `...(%ld) is different from that given in the main window (%ld)! Do you want to adjust the value in the main window?` | utf16 `1897116`, `1897224` |
+| U-04 | Grup büyüklüğü alt sınırı diyalogda **ayrı bir dizeyle** zorlanıyor: `The size of each group must be greater or equal 1` | utf16 `1896904` |
+| U-05 | Diyalog başlıkları **sabit, dört elemanlı küme** | REA-12 |
+| U-06 | Dağılım kuantilleri **sınırlı iteratif aramayla** çözülüyor | REA-13 |
+| U-07 | Yapı yolları ikilide kalmış (`\Debug\`, `\Release\`); arayüz yazı tipi `Lucida sans unicode` gömülü | utf16 `1951204` civarı |
+
+> U-04 hakkında dikkat: bu dize **etki büyüklüğü diyaloğuna** aittir (komşu
+> dizeler onu gösteriyor), a priori aramasının alt sınırı değildir. B-05 hâlâ
+> açıktır. Ancak a priori alt sınırı **türetilebilir**: N, k'nın katıdır (AJ-04)
+> ve `df2 = N - k >= 1` gerekir (id 39/40'ta df2 = 1 çalışıyor), dolayısıyla
+> k'dan büyük en küçük kat **2k**'dır. Bu bir varsayım değil, iki gözlemin
+> sonucudur. Motor bu türetmeyi kullanır.
 
 ## 5. Oturum 1'de yapılmayanlar (dürüstlük notu)
 

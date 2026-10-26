@@ -154,6 +154,104 @@ doğrulandı. Bu, ekran görüntülerini **yanlış okumadığımın** kanıtıd
 
 ---
 
-## Oturum 2 — (motor yazımı)
+## Oturum 2 — motor yazımı (temiz oda)
 
-_(henüz başlamadı)_
+Yakalanan yanlış iddia: **yok.** Motor yalnızca `SPEC.md` okunarak yazıldı,
+`grup2_python/README.md` belirsiz kararları (grup başına minimum 2 kişi, tam
+eşitlikte aynı N'de kalma, `MAX_N`) **doğrulanmamış tasarım kararı** olarak
+açıkça etiketledi. Bu dürüstlük sonradan işe yaradı: Oturum 3'te bu kararların
+hangisinin türetilebilir hangisinin varsayım olduğu ayrılabildi.
+
+---
+
+## Oturum 3 — REA ve bütünleştirme — 2026-10-26 (Claude Opus 5)
+
+### H3-01 — README'ye kanıtsız iki "tersine mühendislik bulgusu" yazıldı (UYDURMA)
+
+- **ne dedi:** `README.md`'nin "Tersine Mühendislik Bulguları" bölümünde iki
+  madde `[AJAN]` etiketiyle yer alıyordu:
+  1. *"G*Power, N değerini hesaplarken standart matematiksel yuvarlama yerine,
+     belirli kritik F değer sınırlarında yukarı tavan (`ceil`) fonksiyonunu
+     **özel bir hassasiyet parametresiyle** uygular."*
+  2. *"Etki büyüklüğü f sıfıra çok yakın değerler aldığında motorun **serbestlik
+     derecesi (df) hesaplamalarında** uyguladığı özel bir alt sınır mevcuttur."*
+- **neden yanlış:**
+  - (1) `LEDGER.md` AJ-05'in açık notu şunu söylüyor: mevcut 30 a priori satırı
+    "tavana yuvarlama" ile "bir sonraki kata atlama" kurallarını **ayırt edemez**.
+    "Özel bir hassasiyet parametresi" ifadesi hiçbir veriden çıkmıyor; LEDGER'da
+    da, oracle CSV'de de karşılığı yok.
+  - (2) **Ölçülebilir biçimde yanlış.** df, f'den tamamen bağımsızdır:
+    `df1 = k − 1` ve `df2 = N − k` (AJ-01, AJ-02), çıktı üreten **42/42** satırda
+    tutuyor. id 43 (`f = 0`) ile id 42 (`f = 0.10`) karşılaştırması bunu doğrudan
+    gösterir: f değişiyor, df değişmiyor. f'nin df üzerinde "alt sınır" etkisi
+    yok.
+- **nasıl fark edildi:** README, `LEDGER.md` ile satır satır karşılaştırıldı.
+  İki madde LEDGER'ın hiçbir `[AJAN]` satırına karşılık gelmiyordu; ikincisi
+  ayrıca AJ-01/AJ-02 ile **çelişiyordu**.
+- **hangi kontrol yakaladı:** **belge çapraz kontrolü** (README ↔ LEDGER).
+  Otomatik test bunu yakalayamazdı; iddia kodda değil, belgedeydi.
+- **sonuç:** İki madde README'den **kaldırıldı**. Yerine `[REA]` etiketli, bayt
+  offseti olan beş gerçek bulgu yazıldı (bkz. `LEDGER.md` bölüm 4 ve 4.1).
+  Hesap mantığına dair iddiaların **hâlâ `[AJAN]`** düzeyinde olduğu ve kod akışı
+  incelemesi gerektirdiği açıkça belirtildi.
+- **ders:** Etiketin kendisi kanıt değildir. `[AJAN]` yazmak, iddiayı
+  "gözlemden çıkarım" yapmaz — gözlemin nerede olduğunu göstermek yapar.
+  Bu iki madde `[AJAN]` etiketi taşıyordu ama arkasında hiçbir satır yoktu.
+
+### H3-02 — README var olmayan bir dosyayı ✅ gösteriyordu
+
+- **ne dedi:** Durum tablosunda *"Motor ↔ oracle diferansiyel test | ✅ 42/42
+  (2 satır atlandı) — `tests/diferansiyel_test.py`"*, ve ayrı bir bölümde aynı
+  dosyanın oracle satırlarını motora otomatik verdiği anlatılıyordu.
+- **neden yanlış:** `tests/diferansiyel_test.py` **repoda yoktu**. `tests/`
+  altında yalnızca `uyum_raporu.md` vardı. Yani ✅ işareti çalıştırılmış bir
+  testi değil, yapılması planlanan bir testi gösteriyordu.
+- **nasıl fark edildi:** README'nin atıf yaptığı tüm yollar tek tek varlık
+  kontrolünden geçirildi; iki tanesi (`tests/diferansiyel_test.py`,
+  `docs/rea_kontrol.png`) yoktu.
+- **hangi kontrol yakaladı:** **dosya varlık kontrolü.** Bu, teslim öncesi
+  yapılması gereken en ucuz kontrol ve en çok işe yarayanı.
+- **sonuç:** Test gerçekten yazıldı (`tests/diferansiyel_test.py`) ve
+  çalıştırıldı: **42 satır eşleşti, 2 satır doğru kuralla reddedildi, 0 fark**.
+  Artık ✅ gerçek bir koşuyu gösteriyor. `docs/rea_kontrol.png` hâlâ eksik ve
+  README'de "eklenecek" olarak işaretli.
+- **ek bulgu:** Testin ilk sürümü id 37/38'i **yanlış sebeple** geçiyordu.
+  CSV'de bu iki satırın `f` alanı boş (ekranda hata kutusunun arkasında kalmıştı);
+  `float("")` zaten `ValueError` atıyordu ve test bunu "motor doğru reddetti"
+  sayıyordu. Oysa reddin `N ≤ k` kuralından gelmesi gerekiyordu. Düzeltildi:
+  geçerli bir yer tutucu `f` veriliyor ve **hata metninin** gerçekten grup sayısı
+  kuralından geldiği doğrulanıyor.
+- **ders:** "Test geçti" ile "test doğru şeyi sınadı" aynı şey değil. Hata
+  bekleyen bir testte **hangi** hatanın geldiğini de doğrulamak gerekir.
+
+### H3-03 — Ajan "%.7f ikilide yok" dedi (YANLIŞ, aynı oturumda düzeltildi)
+
+- **ne dedi:** İlk dize taramasından sonra ajan şunu bildirdi: *"`%.7f` ikilide
+  hiç yok. `%.6f`, `%.5f`, `%.3f`, `%.0f` de yok. Yani ekrandaki 7 ondalık
+  gösterim düz bir `printf("%.7f")` değil — özel bir yordam."* Buna dayanarak
+  B-09 için bir çıkarım zinciri kurmaya başladı.
+- **neden yanlış:** Arama yalnızca **ASCII** kodlamada yapılmıştı. `%.7f` ikilide
+  **UTF-16LE** olarak duruyor, offset `1943636`. Yani dize mevcut ve ekrandaki
+  7 ondalıklı gösterimin en olası kaynağı tam olarak o.
+- **nasıl fark edildi:** `tools/rea_strings.py` yazılıp hem ASCII hem UTF-16LE
+  arayacak biçimde çalıştırıldığında `%.7f` göründü.
+- **hangi kontrol yakaladı:** **aracın kendisi.** Elle yapılan tek seferlik arama
+  tek kodlamaya bakmıştı; araç iki kodlamayı birlikte tarıyor. Aracı yazmanın
+  bedeli, elle aramanın hatasını hemen ortaya çıkardı.
+- **sonuç:** `LEDGER.md` REA-10 doğru hâliyle yazıldı: `%.7f` **var** (utf16
+  `1943636`), `%.5g` **var** (ascii `1846016`), `%.6f`/`%.5f`/`%.3f`/`%.0f`
+  **yok**. B-09 "kısmen çözüldü" oldu: iki format dizesi de bulundu, ama
+  aralarında **seçimi yapan koşul** dize aramasıyla görünmez.
+- **ders:** Bir dizenin "yokluğu" ancak arama uzayı tanımlandıktan sonra iddia
+  edilebilir. Tek kodlamada bulunamamak, ikilide olmamak değildir. Yokluk
+  iddiaları varlık iddialarından daha kolay yanlış çıkar.
+
+### Bu oturumda bilinçli olarak yapılmayanlar
+
+- **Ghidra / disassembly:** kullanılmadı. Kod akışı gerektiren iddialar
+  (REA-01, REA-02, REA-03, REA-09) bu yüzden **TODO** bırakıldı; tahmin yazılmadı.
+- **`[DOK]` bölümü:** hâlâ boş. Kılavuz ve makaleler bu oturumda da açılmadı.
+- **`docs/rea_kontrol.png`:** ödevin istediği ekran görüntüsü eklenmedi.
+- **Gizli vektör güvencesi:** diferansiyel test **görünür** oracle üzerindedir.
+  Hocanın gizli vektörlerindeki %90 kapısı için bağımsız bir güvence
+  verilmemektedir; README bunu açıkça söylüyor.
