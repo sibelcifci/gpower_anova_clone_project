@@ -138,7 +138,8 @@ yapmadığının testle kanıtıdır.
 
 - [ ] Claude Code oturumundan doğal dil dökümü / ekran görüntüsü
       (`docs/ajan_demo_ekran.png`) — araç çağrısı ve cevabı birlikte görünmeli.
-- [ ] 60 saniyelik demo videosu (README'deki "Demo Video" bölümü).
+- [x] Demo videosu çekildi ve yayımlandı: https://youtu.be/5hJnOqY5SKM
+      (README'deki "Demo Video" bölümünden de bağlı).
 
 > Yukarıdaki araç alışverişleri **gerçekten koşturuldu** ve `tests/mcp_test.py`
 > ile otomatik doğrulanıyor. Doğal dil adımının ekran görüntüsü henüz
@@ -248,9 +249,27 @@ geçici bir aksaklık değil, sürecin belleğindeki modülün eskiliği. Kod
 diskte doğru (CLI aynı anda hata döndürüyor), süreç ise oturum boyunca
 aynı kalıyor.
 
-> **TODO (kapatılmadı):** Sunucu yeniden başlatıldıktan sonra 3. çağrı
-> tekrarlanmalı ve `{"error":"power: alfadan küçük olamaz"}` döndüğü
-> doğrulanmalıdır. Claude Code'da bu, oturumu kapatıp yeniden açmak demek;
-> bu belgeyi yazan oturumun kendisi sonlanacağı için yapılmadı.
-> **Bu belgede doğrulanmış gibi gösterilmiyor, çünkü doğrulanmadı.**
+### TODO KAPATILDI — 2026-10-26, yeni oturum
+
+Yukarıdaki TODO, bir sonraki Claude Code oturumunda kapatıldı. Oturum
+yeniden açıldığı için MCP sunucusu da **taze bir süreç** olarak başladı;
+3. çağrı birebir yinelendi:
+
+`anova_a_priori(f=0.25, alpha=0.05, power=0.01, groups=3)`
+
+```json
+{"error":"power: alfadan küçük olamaz"}
+```
+
+Aynı oturumda `power=0.02` ile de denendi, o da aynı kuralla reddedildi —
+yani red tek bir değere özgü değil, kuralın kendisi işliyor.
+
+**Tanı böylece kanıtlandı:** kusur kodda değil, önceki sunucu sürecinin
+belleğindeki bayat moduldeydi. `core.py` diskte baştan beri doğruydu (CLI
+aynı anda hatayı döndürüyordu). Kural (SPEC 6.8) ajan katmanından da doğru
+uygulanıyor.
+
+> **Ders yerinde duruyor:** motor değiştiğinde MCP sunucusu yeniden
+> başlatılmalıdır. Tek motor mimarisi kodu tek yerde tutar ama çalışan
+> süreci kendiliğinden tazelemez.
 

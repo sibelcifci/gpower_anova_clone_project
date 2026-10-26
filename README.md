@@ -5,10 +5,19 @@ Tek yönlü ANOVA (F testi, sabit etkiler, omnibus) için güç analizi motorunu
 Referans alınan yazılım **G*Power 3.1.9.7 (Windows)**'tur. Bu proje G*Power'ın bir parçası değildir, onunla ilişkili değildir ve onun adını taşımaz.
 
 **Grup Bilgileri:** Grup 17 (k3)
-* SİBEL ÇİFCİ
-* GÖNÜL NAZİRE AYDIN
-* CEM ERŞEN
-* KORKUT ŞAHAN
+
+### Geliştiriciler
+
+> Satırlar bilerek boş bırakılmıştır: her geliştirici kendi bilgisini kendisi yazar.
+> Alt grup sütunu temiz oda ayrımını gösterir — **Grup 1** oracle/SPEC tarafı,
+> **Grup 2** izolasyonlu kodlama tarafı (G*Power'ı hiç görmeyen ekip).
+
+| # | Ad Soyad | Öğrenci No | Alt Grup | Katkı / Sorumluluk | GitHub |
+|---|---|---|---|---|---|
+| 1 |  |  |  |  |  |
+| 2 |  |  |  |  |  |
+| 3 |  |  |  |  |  |
+| 4 |  |  |  |  |  |
 
 > **Katmanlar:** Temel Katman (CLI) ✅, MCP sunucusu (+15) ✅, AI ajanı (+10) ✅.
 > Hesap mantığı tek motordadır (`src/anova_power/core.py`); CLI, MCP ve ajan bu
@@ -25,7 +34,7 @@ Bu proje, GUI tabanlı G*Power yazılımının Tek Yönlü ANOVA (One-Way ANOVA)
 
 | Aşama | Durum |
 |---|---|
-| Oracle veri toplama | ✅ **60 ekran görüntüsü, 60 satır** (Oturum 1: 44, Oturum 4: 16) |
+| Oracle veri toplama | ✅ **61 ekran görüntüsü, 61 satır** (Oturum 1: 44, Oturum 4: 16, REA-19 doğrulaması: 1) |
 | Bağımsız çapraz kontrol | ✅ a priori 30/30, post hoc 12/12 eşleşti |
 | A priori davranışı | ✅ `SPEC.md` bölüm 3 |
 | Post hoc davranışı | ✅ `SPEC.md` bölüm 4 — N'in katı olmaması, `N ≤ k` hatası, `f = 0` dahil |
@@ -33,8 +42,8 @@ Bu proje, GUI tabanlı G*Power yazılımının Tek Yönlü ANOVA (One-Way ANOVA)
 | CLI (bayraklı + stdin JSON) | ✅ `src/anova_power/cli.py` — `python -m anova_power --mode ...` |
 | MCP sunucusu (+15) | ✅ `src/anova_power/mcp_server.py` — bağımlılıksız stdio JSON-RPC |
 | AI ajanı (+10) | ✅ MCP üzerinden doğal dil — `.mcp.json` |
-| Motor ↔ oracle diferansiyel test | ✅ **60/60** — 44 eşleşme + 16 doğru red, fark 0 — `tests/diferansiyel_test.py` |
-| Geçersiz girdi (a priori + post hoc) | ✅ **16 vektör toplandı** (id 45–60) — `SPEC.md` bölüm 6, `oracle/X_TOPLAMA.md` |
+| Motor ↔ oracle diferansiyel test | ✅ **61/61** — 44 eşleşme + 17 doğru red, fark 0 — `tests/diferansiyel_test.py` |
+| Geçersiz girdi (a priori + post hoc) | ✅ **17 vektör toplandı** (id 45–61) — `SPEC.md` bölüm 6, `oracle/X_TOPLAMA.md` |
 | Kabul aralıkları (`f`, `α`, `power`) | ✅ ölçüldü ve motora işlendi — `SPEC.md` 6.1–6.3 |
 | Kesirli grup sayısı davranışı | ✅ çözüldü (en yakına yuvarlama) — `SPEC.md` 6.5 |
 | Gösterim biçimi kuralı | ⚠️ BELİRSİZ — `LEDGER.md` bölüm 2.4 |
@@ -62,9 +71,9 @@ Motorun doğruluğu 3 kademeli test mekanizması ile sınanmıştır:
 
 * **Oracle (Referans) Veri Seti:** G*Power GUI arayüzünden alınan ekran görüntüleri ve bunlardan çıkarılan referans veriler (`oracle/anova_oneway.csv`) mutlak doğru kabul edilmiştir.
 * **SPEC Vektörleri Testi:** `grup2_python/test_anova_power.py`, SPEC içindeki 6 a priori ve 9 post hoc vektörünü, 6 kritik F değerini, sınır/hata durumlarını ve CLI sözleşmesini sınar (6 test yöntemi başarılı; bkz. `grup2_python/TEST_SONUCLARI.md`).
-* **Oracle Diferansiyel Testi:** `tests/diferansiyel_test.py`, `oracle/anova_oneway.csv` satırlarını motora otomatik girdi olarak verir. Sonuç: **60 satırın 60'ında uyum** — 44 satırda sayısal eşleşme (a priori'de toplam N tam eşleşme, `actual_power` 1e-6 içinde) ve 16 hata satırında **doğru kuraldan gelen red**. Hata satırları atlanmaz: reddin G*Power'ın gösterdiği kuralla aynı sebepten geldiği ayrıca doğrulanır.
+* **Oracle Diferansiyel Testi:** `tests/diferansiyel_test.py`, `oracle/anova_oneway.csv` satırlarını motora otomatik girdi olarak verir. Sonuç: **61 satırın 61'inde uyum** — 44 satırda sayısal eşleşme (a priori'de toplam N tam eşleşme, `actual_power` 1e-6 içinde) ve 17 hata satırında **doğru kuraldan gelen red**. Hata satırları atlanmaz: reddin G*Power'ın gösterdiği kuralla aynı sebepten geldiği ayrıca doğrulanır.
 
-> **Önemli sınır:** Yukarıdaki oran *görünür* oracle verisi üzerindedir. Hocanın gizli test vektörleri ayrıdır; onlardaki %90 kapısı için bağımsız bir güvence verilmemektedir. Geçersiz girdi davranışı artık ölçülmüştür (id 45–60); hâlâ eksik olanlar: gösterim biçimi kuralı, `power <= alpha` bandı ve kabul aralıklarının alt uç değerleri.
+> **Önemli sınır:** Yukarıdaki oran *görünür* oracle verisi üzerindedir. Hocanın gizli test vektörleri ayrıdır; onlardaki %90 kapısı için bağımsız bir güvence verilmemektedir. Geçersiz girdi davranışı artık ölçülmüştür (id 45–60); `power < alpha` reddi de ölçülmüştür (id 61); hâlâ eksik olanlar: gösterim biçimi kuralı ve kabul aralıklarının alt uç değerleri (`f = 1e-06`, `α = 1e-07`).
 
 ---
 
@@ -189,10 +198,20 @@ Beklenen çıktı:
 | `total_n` | post_hoc | Toplam örneklem büyüklüğü |
 
 **Testleri çalıştırma** (repo kökünden, bağımlılıklar kuruluyken):
+
 ```bash
-python -m unittest discover -s grup2_python -p test_anova_power.py -v
-python tests/diferansiyel_test.py
+# Ortam -- PowerShell:  $env:PYTHONPATH="src"; $env:PYTHONUTF8="1"
+# Ortam -- bash:        export PYTHONPATH=src PYTHONUTF8=1
+
+python -m unittest discover -s grup2_python -p test_anova_power.py -v   # 6 test
+python -m unittest discover -s tests -p "*_test.py" -v                  # 5 test (MCP katmanı)
+python tests/diferansiyel_test.py                                       # 61/61, fark 0
 ```
+
+> `tests/` altındaki dosyalar `*_test.py` ile bittiği için `-p "*_test.py"`
+> deseni **gereklidir**; `unittest discover`'ın varsayılan deseni (`test*.py`)
+> bu dosyaları bulamaz ve `NO TESTS RAN` yazar.
+> `PYTHONUTF8=1` olmadan Windows'ta Türkçe karakterler bozuk görünür.
 
 ### Bayraklı CLI (ödev sözleşmesi)
 
@@ -266,7 +285,13 @@ _(ödev gereği ekran görüntüsü: `docs/rea_kontrol.png` — eklenecek)_
 > ```
 
 ## Demo Video
-60 saniyelik CLI demosu: _(link eklenecek)_
+
+YouTube: **https://youtu.be/5hJnOqY5SKM**
+
+Videoda sırasıyla: bayraklı CLI (a priori → `total_n = 159`), post hoc uyarı
+alanı, kılavuzda bulunmayan kesirli grup davranışı (`k = 2.5` → 159, `k = 2.4`
+→ 128), hata yolları, **oracle diferansiyel testi (61/61, fark 0)**, test
+paketleri ve MCP üzerinden doğal dille çalışan AI ajanı.
 
 ---
 
