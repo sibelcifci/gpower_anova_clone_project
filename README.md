@@ -106,7 +106,10 @@ GRUP1_GOREV.md       Alt Grup 1'in analiz ve veri toplama adımları
 EKSIK_VAKALAR.md     G*Power'da çalıştırılacak eksik girdi vektörleri
 HALLUCINATIONS.md    ajan hatalarının dürüst kaydı
 AGENT_COST.md        ajan adımları ve maliyet kaydı
-prompts/             her oturumun ilk promptu
+requirements.txt     motorun tek bagimliligi (scipy); kurulum kokten yapilir
+prompts/             oturum kayitlari
+  oturum1_inceleme.md  Oturum 1'in birebir promptu
+  oturum2_yazim.md     Oturum 2 temiz oda kaydi (prompt metni korunmadi)
 oracle/              kâhin verisi
   anova_oneway.csv     44 satır (30 a priori + 14 post hoc)
   RENAME_MAP.csv       eski ad → v{id}.png eşlemesi
@@ -125,21 +128,35 @@ tests/               diferansiyel_test.py (motor ↔ oracle) ve uyum_raporu.md
 ---
 
 ## Kurulum
-Python 3.10+ gerekir. Windows / PowerShell:
+Python 3.10+ gerekir. Tek bağımlılık `scipy`'dir (`requirements.txt`).
+Kurulum **repo kökünde** yapılır — motor `src/anova_power/` altındadır.
+
+Windows / PowerShell:
 
 ```powershell
-cd grup2_python
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+$env:PYTHONPATH="src"; $env:PYTHONUTF8="1"
+.\.venv\Scripts\python.exe -m anova_power --mode a_priori --f 0.25 --alpha 0.05 --power 0.80 --groups 3
 ```
 
 Linux / macOS:
 
 ```bash
-cd grup2_python
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
+PYTHONPATH=src PYTHONUTF8=1 .venv/bin/python -m anova_power --mode a_priori --f 0.25 --alpha 0.05 --power 0.80 --groups 3
 ```
+
+İkisi de şu satırı basar:
+
+```json
+{"lambda":9.9375,"critical_f":3.0540042,"df1":2,"df2":156,"actual_power":0.8048873,"total_n":159}
+```
+
+> `grup2_python/` altındaki kendi `requirements.txt`'i ve kurulum talimatı
+> **Alt Grup 2'nin temiz oda teslimini olduğu gibi** korumak için duruyor;
+> teslimi değerlendirmek için gereken kurulum yukarıdakidir.
 
 ## Çalıştırma
 Motor, standart girdiden **tek bir JSON nesnesi** okur ve standart çıktıya **tek satır JSON** yazar. Başarıda çıkış kodu 0, geçersiz girdide `{"error":"..."}` ve çıkış kodu 1'dir.

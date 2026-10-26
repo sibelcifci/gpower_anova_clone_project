@@ -4,15 +4,36 @@ Her ajan oturumunun ne kadar tükettiğinin kaydı. Jeton ve ücret sayıların�
 ajan kendisi ölçemez; bu alanlar **arayüzden okunup elle** doldurulmalıdır.
 Uydurulmuş bir sayı yazmak, boş bırakmaktan kötüdür.
 
+## Boş alanlar nereden okunur
+
+Aşağıdaki tabloda `_(okunacak)_` yazan her hücre, oturumun koştuğu arayüzden
+alınmalıdır. Ajanın kendi bağlam penceresinden bu sayıya erişimi yoktur:
+jeton sayımı ve ücretlendirme ajanın dışında, istemci/API tarafında tutulur.
+
+| arayüz | nereye bakılır |
+|---|---|
+| Claude Code (terminal) | oturum içinde `/cost` — o oturumun jeton ve ücret dökümünü verir; `/status` modeli ve oturum bilgisini gösterir |
+| Claude Desktop / claude.ai | Ayarlar → kullanım (Usage) sayfası, tarih filtresiyle |
+| API / SDK | yanıtların `usage` alanı (`input_tokens`, `output_tokens`) toplanır |
+
+**Kapanmış oturumlar için:** oturum sonlandıysa `/cost` artık o oturumu
+göstermez; sayı yalnızca kullanım sayfasından **tarih bazında** okunabilir ve
+o gün başka iş de yapıldıysa oturuma izole edilemez. Böyle bir durumda hücre
+`_(oturum kapandı, izole edilemiyor)_` yazılmalı — tahmini bir sayı değil.
+
+Bu, ölçüm disiplininin bir parçası: `HALLUCINATIONS.md` mantığıyla, **bilinmeyen
+bir sayının yerine makul görünen bir sayı yazmak** en pahalı hata türüdür.
+
 ---
 
 ## Özet tablo
 
 | # | Oturum | Tarih | Model | Girdi jetonu | Çıktı jetonu | Ücret | Süre |
 |---|---|---|---|---|---|---|---|
-| 1 | İnceleme / oracle | 2026-10-22 | Claude Opus 5 | _(doldurulacak)_ | _(doldurulacak)_ | _(doldurulacak)_ | _(doldurulacak)_ |
-| 2 | Motor yazımı (temiz oda) | 2026-10-25 | LLM (Grup 2) | _(doldurulacak)_ | _(doldurulacak)_ | _(doldurulacak)_ | _(doldurulacak)_ |
-| 3 | REA + bütünleştirme | 2026-10-26 | Claude Opus 5 | _(doldurulacak)_ | _(doldurulacak)_ | _(doldurulacak)_ | _(doldurulacak)_ |
+| 1 | İnceleme / oracle | 2026-10-22 | Claude Opus 5 | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
+| 2 | Motor yazımı (temiz oda) | 2026-10-25 | LLM (Grup 2) | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
+| 3 | REA + bütünleştirme | 2026-10-26 | Claude Opus 5 | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
+| 4 | Eksik taraması / teslim denetimi | 2026-10-26 | Claude Opus 5 | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
 
 ---
 
@@ -49,12 +70,12 @@ sekmesinden metin çıktısı almak olurdu; o sekmenin içeriği elimizdeki
 görsellerde yok. **Öneri:** sonraki ölçümlerde ekran görüntüsünün yanında
 protokol metni de kaydedilsin.
 
-### Doldurulacak alanlar
+### Arayüzden okunacak alanlar
 
 ```
-Girdi jetonu   : ____
-Çıktı jetonu   : ____
-Toplam ücret   : ____
+Girdi jetonu   : ____    <- /cost veya kullanim sayfasi
+Cikti jetonu   : ____
+Toplam ucret   : ____
 Duvar saati    : ____
 ```
 
@@ -73,6 +94,11 @@ Duvar saati    : ____
 | Test yöntemi | 6, tamamı geçti |
 | Okunan ekran görüntüsü | **0** (temiz oda) |
 | Oracle CSV erişimi | **yok** — bu yüzden tam oracle regresyonu Oturum 3'e kaldı |
+| Ortam | Windows, Python 3.14, SciPy 1.18.1, NumPy 2.5.4 |
+| Test koşu süresi | 13,119 s (`grup2_python/TEST_SONUCLARI.md`) |
+
+> Not: yukarıdaki süre **testlerin** koşu süresidir, oturumun duvar saati
+> değildir. İkisi karıştırılmamalı; duvar saati hâlâ okunacak alanlardadır.
 
 **Maliyet notu:** Bu oturum ucuzdu çünkü görsel okuma yok. Ancak oracle CSV
 verilmediği için motorun 44 satıra karşı doğrulanması yapılamadı; o iş Oturum
@@ -108,11 +134,59 @@ bulmak (H3-01) her iki belgeyi satır satır okumayı gerektirdi.
 kapanmıştı; oysa aradığı iki metin zaten elindeydi ve araç 110 satır. Oturum 1'in
 en büyük belirsizliklerinden ikisi (B-09, B-10) bu araçla kapanırdı.
 
-### Doldurulacak alanlar
+### Arayüzden okunacak alanlar
 
 ```
-Girdi jetonu   : ____
-Çıktı jetonu   : ____
-Toplam ücret   : ____
+Girdi jetonu   : ____    <- /cost veya kullanim sayfasi
+Cikti jetonu   : ____
+Toplam ucret   : ____
+Duvar saati    : ____
+```
+
+---
+
+## Oturum 4 — eksik taraması / teslim denetimi
+
+- **Tarih:** 2026-10-26
+- **Model:** Claude Opus 5 (Claude Code, Windows)
+- **Amaç:** Teslimi ödev isterleriyle karşılaştırmak, eksikleri önceliklendirmek,
+  ucuz olanları kapatmak. **Motor koduna dokunulmadı.**
+
+### Ölçülebilen iş hacmi
+
+| metrik | değer |
+|---|---|
+| Okunan proje belgesi | 12 (README, LEDGER, HALLUCINATIONS, EKSIK_VAKALAR, uyum raporu, AGENT_COST, ajan demo, SPEC başlıkları, GRUP1_GOREV, grup2 README + TEST_SONUCLARI, .mcp.json) |
+| Okunan ekran görüntüsü | **0** |
+| Koşturulan test paketi | 3 — diferansiyel (42/42 + 2/2 doğru red), MCP (5 OK), SPEC (6 OK) + CLI duman testi |
+| Git doğrulaması | 5 (remote, push durumu, SPEC md5 eşitliği, teslim commit içeriği, oracle↔grup2 ata ilişkisi) |
+| Tespit edilen eksik | 8, öncelik sırasına dizildi |
+| Kapatılan eksik | 3 (`requirements.txt`, `prompts/oturum2_yazim.md`, bu kayıt) |
+| Yazılan motor satırı | **0** |
+
+### Maliyetin büyük kısmı nerede
+
+En pahalı kalem **belge okuma** (12 dosya); testleri koşturmak ve git
+sorgulamak toplamda bir dakikanın altında kaldı ve asıl bulguları onlar
+verdi. 8 eksiğin 5'i belgelerin kendi durum tablolarından okunabiliyordu;
+ama **3'ü yalnızca komut çalıştırarak** ortaya çıktı:
+
+1. Kökte `requirements.txt` olmaması — hiçbir belgede yazmıyor, `ls` ile görüldü.
+2. Oturum 2'nin prompt kaydının olmaması — `ls prompts/` ile görüldü.
+3. Oracle commit'inin grup 2 teslim commit'inin **atası** olması — yani temiz
+   oda izolasyonunun "veri yoktu" diye kanıtlanamayacağı. Bu, belgelerin
+   hiçbirinde yazmıyordu ve yalnızca `git merge-base --is-ancestor` ile çıktı.
+
+**Ders:** teslim denetimi belge okumakla bitmiyor. Belgeler projenin kendi
+anlattığı hâlini verir; eksikler çoğunlukla **anlatılmayan** yerdedir ve
+onları ancak çalıştırmak gösterir. Üç bulgunun üçü de ucuz komutlardan geldi;
+bu oturumun en verimli kalemi buydu.
+
+### Arayüzden okunacak alanlar
+
+```
+Girdi jetonu   : ____    <- /cost veya kullanim sayfasi
+Cikti jetonu   : ____
+Toplam ucret   : ____
 Duvar saati    : ____
 ```

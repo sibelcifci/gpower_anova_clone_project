@@ -1,0 +1,11 @@
+# Motorun calisma zamani bagimliligi.
+# Kurulum:  pip install -r requirements.txt
+#
+# scipy, merkezi F kuantili (f.isf) ve merkezi olmayan F kuyruk olasiligi
+# (ncf.sf) icin kullanilir; bu iki yordam src/anova_power/core.py'nin
+# tamamini olusturan hesabin temelidir. Baska ucuncu parti bagimlilik yoktur:
+# CLI ve MCP sunucusu yalnizca standart kutuphane kullanir.
+#
+# Surum araligi grup2_python/requirements.txt ile ayni tutulmustur; oturum 2
+# (temiz oda) motoru bu araliktaki scipy ile yazilip test edildi.
+scipy>=1.14,<2
