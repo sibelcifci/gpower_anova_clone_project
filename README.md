@@ -25,7 +25,7 @@ Bu proje, GUI tabanlı G*Power yazılımının Tek Yönlü ANOVA (One-Way ANOVA)
 
 | Aşama | Durum |
 |---|---|
-| Oracle veri toplama (Oturum 1) | ✅ 44 ekran görüntüsü, 44 satır |
+| Oracle veri toplama | ✅ **60 ekran görüntüsü, 60 satır** (Oturum 1: 44, Oturum 4: 16) |
 | Bağımsız çapraz kontrol | ✅ a priori 30/30, post hoc 12/12 eşleşti |
 | A priori davranışı | ✅ `SPEC.md` bölüm 3 |
 | Post hoc davranışı | ✅ `SPEC.md` bölüm 4 — N'in katı olmaması, `N ≤ k` hatası, `f = 0` dahil |
@@ -33,8 +33,10 @@ Bu proje, GUI tabanlı G*Power yazılımının Tek Yönlü ANOVA (One-Way ANOVA)
 | CLI (bayraklı + stdin JSON) | ✅ `src/anova_power/cli.py` — `python -m anova_power --mode ...` |
 | MCP sunucusu (+15) | ✅ `src/anova_power/mcp_server.py` — bağımlılıksız stdio JSON-RPC |
 | AI ajanı (+10) | ✅ MCP üzerinden doğal dil — `.mcp.json` |
-| Motor ↔ oracle diferansiyel test | ✅ 42/42 eşleşme + 2/2 doğru red — `tests/diferansiyel_test.py` |
-| Geçersiz girdi (a priori) | ❌ hâlâ yok — `EKSIK_VAKALAR.md` bölüm 2 |
+| Motor ↔ oracle diferansiyel test | ✅ **60/60** — 44 eşleşme + 16 doğru red, fark 0 — `tests/diferansiyel_test.py` |
+| Geçersiz girdi (a priori + post hoc) | ✅ **16 vektör toplandı** (id 45–60) — `SPEC.md` bölüm 6, `oracle/X_TOPLAMA.md` |
+| Kabul aralıkları (`f`, `α`, `power`) | ✅ ölçüldü ve motora işlendi — `SPEC.md` 6.1–6.3 |
+| Kesirli grup sayısı davranışı | ✅ çözüldü (en yakına yuvarlama) — `SPEC.md` 6.5 |
 | Gösterim biçimi kuralı | ⚠️ BELİRSİZ — `LEDGER.md` bölüm 2.4 |
 | REA (ikili inceleme) | ✅ 6 satır kanıtlandı, 8 TODO — `LEDGER.md` bölüm 4 |
 | Ödev CLI sözleşmesi (`--mode ...` bayrakları) | ✅ `src/anova_power/cli.py` |
@@ -60,9 +62,9 @@ Motorun doğruluğu 3 kademeli test mekanizması ile sınanmıştır:
 
 * **Oracle (Referans) Veri Seti:** G*Power GUI arayüzünden alınan ekran görüntüleri ve bunlardan çıkarılan referans veriler (`oracle/anova_oneway.csv`) mutlak doğru kabul edilmiştir.
 * **SPEC Vektörleri Testi:** `grup2_python/test_anova_power.py`, SPEC içindeki 6 a priori ve 9 post hoc vektörünü, 6 kritik F değerini, sınır/hata durumlarını ve CLI sözleşmesini sınar (6 test yöntemi başarılı; bkz. `grup2_python/TEST_SONUCLARI.md`).
-* **Oracle Diferansiyel Testi:** `tests/diferansiyel_test.py`, `oracle/anova_oneway.csv` satırlarını motora otomatik girdi olarak verir. Sonuç: okunabilir **42 satırın 42'sinde eşleşme** (a priori'de toplam N tam eşleşme; her satırda `actual_power` 1e-6 içinde). Hata kutusu gösteren 2 satır (id 37, 38; `f` okunamadığı için) atlanmıştır.
+* **Oracle Diferansiyel Testi:** `tests/diferansiyel_test.py`, `oracle/anova_oneway.csv` satırlarını motora otomatik girdi olarak verir. Sonuç: **60 satırın 60'ında uyum** — 44 satırda sayısal eşleşme (a priori'de toplam N tam eşleşme, `actual_power` 1e-6 içinde) ve 16 hata satırında **doğru kuraldan gelen red**. Hata satırları atlanmaz: reddin G*Power'ın gösterdiği kuralla aynı sebepten geldiği ayrıca doğrulanır.
 
-> **Önemli sınır:** Yukarıdaki oran *görünür* oracle verisi üzerindedir. Hocanın gizli test vektörleri ayrıdır; onlardaki %90 kapısı için bağımsız bir güvence verilmemektedir. Geçersiz girdi davranışı ve gösterim biçimi hâlâ eksiktir (bkz. Durum).
+> **Önemli sınır:** Yukarıdaki oran *görünür* oracle verisi üzerindedir. Hocanın gizli test vektörleri ayrıdır; onlardaki %90 kapısı için bağımsız bir güvence verilmemektedir. Geçersiz girdi davranışı artık ölçülmüştür (id 45–60); hâlâ eksik olanlar: gösterim biçimi kuralı, `power <= alpha` bandı ve kabul aralıklarının alt uç değerleri.
 
 ---
 

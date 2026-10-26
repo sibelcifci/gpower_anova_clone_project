@@ -1,7 +1,7 @@
 # Eksik Vakalar — G*Power'da girilmesi gereken vektörler
 
-Mevcut oracle: **44 satır / 44 ekran görüntüsü**
-(30 `a priori` + 14 `post hoc`).
+Mevcut oracle: **60 satır / 60 ekran görüntüsü**
+(44 `a priori` + 16 `post hoc`).
 
 Aşağıdaki vektörler veri setinde **hâlâ yok**. Her satır G*Power'da doğrudan
 girilebilecek biçimde yazıldı. Çıktı değerlerini ben dolduramam — kâhin
@@ -42,29 +42,31 @@ Artık `SPEC.md` bölüm 4 gerçek verilerle dolu. Elde edilen başlıca bilgile
 
 ---
 
-## 2. ÖNCELİK 1 — Geçersiz girdiler (a priori)
+## 2. TAMAMLANDI ✅ — Geçersiz girdiler (id 45–60)
 
-Hâlâ en büyük boşluk. `SPEC.md` bölüm 6'daki kuralların **hiçbiri**
-doğrulanmadı. Mod: `A priori`.
+**16 vektör toplandı** (2026-10-26). Kayıt: `oracle/X_TOPLAMA.md`,
+görseller `v45.png` … `v60.png`, kurallar `SPEC.md` bölüm 6.
 
-**Hata kutusu çıkarsa kutunun metnini de yakala** — id 37/38'de olduğu gibi,
-metnin kendisi REA için dize araması başlangıcı oluyor.
+| bulgu | kanıt |
+|---|---|
+| Aralık hataları tek kalıptan: `"<Alan> is outside the admissible range (a, b)"` | id 45–52, 58, 59 |
+| `α` ve `Power` aralığı `(1e-07, 1)`; üst sınır dahil değil | id 48, 50 |
+| **`f` aralığı moda bağlı:** a priori `(1e-06, 50)`, post hoc `(0, 50)` | id 45 ↔ id 58 |
+| **Mesaj ile davranış çelişiyor:** post hoc `(0, 50)` der, `f=0`'ı kabul eder | id 58 ↔ id 43 |
+| `groups < 2` ayrı metin: `"There must be at least 2 groups."` | id 53, 54, 55 |
+| **`groups` kesirli olabilir:** sessizce en yakına yuvarlanır, uyarı yok | id 56 (2.5→3), id 60 (2.4→2) |
+| `α` kutusuna harf yazılabilir; ayrı mesaj yok | id 57 |
 
-| # | f | α | güç | k | sınanan |
-|---|---|---|---|---|---|
-| X-01 | **0** | 0.05 | 0.80 | 3 | a priori'de f=0 (post hoc'ta çalışıyordu, burada N sonsuza gider) |
-| X-02 | **−0.25** | 0.05 | 0.80 | 3 | negatif etki büyüklüğü |
-| X-03 | 0.25 | **0** | 0.80 | 3 | α = 0 |
-| X-04 | 0.25 | **1** | 0.80 | 3 | α = 1 |
-| X-05 | 0.25 | **−0.05** | 0.80 | 3 | negatif α |
-| X-06 | 0.25 | 0.05 | **1** | 3 | güç = 1 (erişilemez) |
-| X-07 | 0.25 | 0.05 | **0** | 3 | güç = 0 |
-| X-08 | 0.25 | 0.05 | **1.5** | 3 | güç > 1 |
-| X-09 | 0.25 | 0.05 | 0.80 | **1** | tek grup → df1 = 0 |
-| X-10 | 0.25 | 0.05 | 0.80 | **0** | sıfır grup |
-| X-11 | 0.25 | 0.05 | 0.80 | **−3** | negatif grup |
-| X-12 | 0.25 | 0.05 | 0.80 | **2.5** | tam sayı olmayan grup sayısı |
-| X-13 | 0.25 | **abc** | 0.80 | 3 | α kutusuna harf |
+### Bu bölümden doğan YENİ eksikler
+
+| # | mod | vektör | ne öğreniriz |
+|---|---|---|---|
+| Y-01 | a priori | `f = 1e-06` | alt sınır dahil mi (mesaj açık aralık diyor) |
+| Y-02 | a priori | `f = 50` | üst sınır dahil mi |
+| Y-03 | a priori | `α = 1e-07` | alt sınır dahil mi |
+| Y-04 | post hoc | `groups = 2.5`, `N = 150` | yuvarlama post hoc'ta da aynı mı |
+| Y-05 | a priori | `groups = 3.5` | yarımda yukarı kuralı tek örnekten ibaret değil mi |
+| Y-06 | post hoc | `N = 0` ve `N = -5` | N için ayrı mesaj kalıbı var mı |
 
 ---
 
