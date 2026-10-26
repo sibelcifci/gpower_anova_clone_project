@@ -36,7 +36,7 @@ Bu proje, GUI tabanlı G*Power yazılımının Tek Yönlü ANOVA (One-Way ANOVA)
 | Motor ↔ oracle diferansiyel test | ✅ 42/42 eşleşme + 2/2 doğru red — `tests/diferansiyel_test.py` |
 | Geçersiz girdi (a priori) | ❌ hâlâ yok — `EKSIK_VAKALAR.md` bölüm 2 |
 | Gösterim biçimi kuralı | ⚠️ BELİRSİZ — `LEDGER.md` bölüm 2.4 |
-| REA (ikili inceleme) | ✅ 5 satır kanıtlandı, 8 TODO — `LEDGER.md` bölüm 4 |
+| REA (ikili inceleme) | ✅ 6 satır kanıtlandı, 8 TODO — `LEDGER.md` bölüm 4 |
 | Ödev CLI sözleşmesi (`--mode ...` bayrakları) | ✅ `src/anova_power/cli.py` |
 
 ---

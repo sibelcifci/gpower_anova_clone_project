@@ -55,7 +55,7 @@ Her biri **diferansiyel testle sınanmalı** ve REA ile doğrulanmalıdır.
 | AJ-03 | `λ = f² · N` | **42/42** | `\|λ_ekran − f²N\| < 5e−7`. Post hoc'ta **girilen N** kullanılır, yuvarlanmış bir N değil |
 | AJ-07 | Kritik F = merkezî F dağılımının üst-α kuantili, `(df1, df2)` ile | **42/42** | `scipy.stats.f.isf`, en büyük sapma 4.8e−08 |
 | AJ-08 | Güç = merkezî olmayan F'nin kritik F üstünde kalan kütlesi | **42/42** | `scipy.stats.ncf.sf`, en büyük sapma 4.8e−08 |
-| AJ-10 | Grafik başlığındaki `critical F = …` etiketi, alandaki değerin **6 anlamlı basamağa** yuvarlanmış ve sondaki sıfırları atılmış hâlidir | **42/42** | etiket ↔ alan karşılaştırması |
+| AJ-10 | Grafik başlığındaki `critical F = …` etiketi, alandaki değerin **6 anlamlı basamağa** yuvarlanmış ve sondaki sıfırları atılmış hâlidir (`%.6g`) | **42/42** | etiket ↔ alan karşılaştırması; **REA-14 ile ikilide doğrulandı** |
 | AJ-11 | Ekranda **grup başına n alanı yoktur** | **44/44** | yokluk gözlemi; `n_per_group` sütunu türetilmiştir |
 | AJ-12 | Aynı girdi vektörü daima aynı çıktıyı verir (determinizm) | **6/6 tekrar grubu** | id 2↔20, 3↔23, 15↔30 (a priori); 32↔33, 35↔36, 39↔40 (post hoc) |
 
@@ -181,6 +181,7 @@ Kural gereği burada yalnızca **bayt offseti + kısa alıntı** vardır.
 | REA-10 | B-09 — sayı biçimleme yordamı | `1846000`–`1846016`, `1943636` | **KISMEN** |
 | REA-12 | B-10 — diyalog başlığı ayrımı | `1951204`–`1951488` (utf16) | **KANITLANDI** |
 | REA-13 | REA-04/05 — kuantil yordamının biçimi | `1846132`–`1846240` (ascii) | **KANITLANDI (dolaylı)** |
+| REA-14 | AJ-10 — grafik etiketi 6 anlamlı basamak | `1872531` (ascii `%.6g`) | **KANITLANDI** |
 | REA-01 | AJ-03 (`lambda = f^2 * N`) motorda böyle hesaplanıyor | — | TODO (kod akışı gerekir) |
 | REA-02 | AJ-04 (a priori'de N, k'nın katına yuvarlanıyor) | — | TODO (kod akışı gerekir) |
 | REA-03 | AJ-05 (en küçük N araması) — arama mı, kapalı form mu | — | TODO (kod akışı gerekir) |
@@ -281,6 +282,32 @@ iteratif arama** anlamına gelir. Bu dizeler binom dağılımına aittir; **F
 kuantili için aynı altyapının kullanıldığı kanıtlanmadı.** Ancak aynı modülde
 (`1846000` format tablosuyla komşu) durmaları, dağılım yordamlarının ortak bir
 arama iskeleti paylaştığına dair güçlü işarettir.
+
+### REA-14 — AJ-10 doğrulandı: grafik etiketi `%.6g`
+
+AJ-10 "grafik başlığındaki `critical F = ...` etiketi, alandaki değerin
+**6 anlamlı basamağa** yuvarlanmış ve sondaki sıfırları atılmış hâlidir"
+diyordu. Bu iddia **42/42** tutuyordu ama doğrulamada kullanılan örnek
+(id 8: alan `4.6970018`, etiket `4.697`) `%.5g` ile `%.6g` arasında
+**ayırt edici değildi** — ikisi de `4.697` verir.
+
+Ayırt edici örnek `v6.png` (id 6):
+
+| alan | etiket | `%.5g` | `%.6g` |
+|---|---|---|---|
+| `1.9174493` | **`1.91745`** | `1.9174` | `1.91745` |
+
+Etiket `1.91745` olduğuna göre kural **`%.6g`**'dir. Ve bu format dizesi
+ikilide mevcuttur: ascii offset `1872531`.
+
+Böylece AJ-10 `[AJAN]` düzeyinden **`[REA]` düzeyine** yükseldi: hem gözlem
+(42/42) hem de ikilide format dizesi var. Aynı ekran görüntüsü `%.7f`
+gözlemini de destekler: alanlar `16.2500000` ve `1.9174493` olarak, yani
+yedi ondalıkla gösteriliyor.
+
+> Dikkat: bu, B-09'u **kapatmaz**. REA-14 yalnızca **grafik etiketini**
+> açıklar (`%.6g`). Çıktı **alanlarındaki** `%.7f` ↔ `%.5g` seçimi hâlâ açıktır
+> (bölüm 2.4'teki üç karşı örnek). İki ayrı biçimleme yolu olduğu artık kesin.
 
 ---
 
