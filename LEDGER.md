@@ -8,9 +8,10 @@ Her iddia bir etiket taşır:
 | `[AJAN]` | Ajanın oracle verisinden çıkarımı — **binary kanıtı yok** | yok |
 | `[REA]` | İkili (binary) incelemesiyle kanıtlanmış | **var** |
 
-> **Oturum 3 (REA) yapıldı.** `tools/rea_strings.py` ile `GPowerNT.exe` üzerinde
-> dize araması çalıştırıldı: 5 `[REA]` satırı kanıtlandı, 8'i TODO kaldı (kod akışı
-> incelemesi gerektiriyor). Decompile/disassembly yapılmadı, ikili repoya konmadı.
+> **İki REA turu yapıldı.** `tools/rea_strings.py` ile `GPowerNT.exe` üzerinde
+> dize araması çalıştırıldı. Oturum 3: 5 satır. Oturum 4 (`--tara` keşif modu,
+> 4138 dize): **7 satır daha kanıtlandı, 2 yeni bulgu (REA-19, REA-20) çıktı**,
+> 2 satır TODO kaldı (kod akışı incelemesi gerektiriyor). Decompile/disassembly yapılmadı, ikili repoya konmadı.
 > Kanıtsız `[REA]` yazmak kural ihlalidir; TODO satırları bilerek TODO.
 
 **Kanıt tabanı:** `oracle/anova_oneway.csv` — **59 satır / 59 ekran görüntüsü**
@@ -227,26 +228,103 @@ Kural gereği burada yalnızca **bayt offseti + kısa alıntı** vardır.
 | REA-09 | AJ-17 (`f = 0` özel durum mu) | — | TODO (kod akışı gerekir) |
 | REA-11 | B-08 (kayan nokta tipi) | — | TODO |
 
-### 4.2 Yeni `[REA]` adayları (id 45–59'dan)
+### 4.2 İkinci REA turu — 2026-10-26 (id 45–60 bulguları)
 
-Aşağıdaki dizeler ekranda **birebir okundu**; ikilide aranmaları hâlinde
-doğrudan `[REA]` kanıtına dönüşürler. Araç hazır: `--ara` veya `--tara`.
+**Araç:** `tools/rea_strings.py --tara` (keşif modu). **Çıktı:** `rea_kesif.md`
+(repoda, yeniden üretilebilir). **SHA-256 doğrulandı**, birinci turdakiyle
+aynı ikili. Taranan dize sayısı: **4138**.
 
-| id | aranacak dize | hangi iddiayı kanıtlar | durum |
+| id | iddia | offset (ascii) | durum |
 |---|---|---|---|
-| REA-15 | `is outside the admissible range` | AJ-20 — kalıp tek parça mı, çalışma anında mı birleşiyor (REA-08'deki gibi) | TODO |
-| REA-16 | `1e-06`, `1e-07`, `50` sabitleri | AJ-21/AJ-22 — sınırlar sabit mi, moda göre iki ayrı sabit mi | TODO |
-| REA-17 | `There must be at least 2 groups` | AJ-24 — ayrı doğrulama yolu | TODO |
-| REA-18 | `Effect size f`, `Alpha`, `Power` alan adları | AJ-20 — alan adı mesaja çalışma anında mı yerleştiriliyor | TODO |
+| REA-15 | AJ-20 — aralık mesajı **çalışma anında birleştiriliyor** | `1855710`, `1855750`, `1855961` | **KANITLANDI** |
+| REA-17 | AJ-24 — `There must be at least 2 groups.` | `1856916` (+ parçalı `1856964`) | **KANITLANDI** |
+| REA-18 | AJ-20 — alan adları ayrı bir dize tablosunda | `1852700`–`1852936` | **KANITLANDI** |
+| REA-04 | AJ-07 — kritik F **sınırlı iteratif aramayla** bulunuyor | `1849244`–`1849420` | **KANITLANDI** |
+| REA-19 | **YENİ** — `Power must be greater than or equal to alpha.` | `1856032` | **KANITLANDI** (davranış sınanmadı) |
+| REA-20 | **YENİ** — `is inside the prohibited range (` ikinci bir doğrulama kategorisi | `1855997` | **KANITLANDI** (hiç gözlenmedi) |
+| REA-21 | REA-06 adayı — `Sample size must be greater than or equal to ` | `1856080`, `1855836` | **KANITLANDI** (hangi yolda kullanıldığı açık değil) |
+| REA-11 | B-08 — kayan nokta tipi | `2123044` (`_isnan`), `2123378` (`_finite`), `1885224` (`Math overflow`) | **KISMEN** |
+| REA-05 | AJ-08 — merkezî olmayan F kuyruğu | — | **TODO, kapsam daraldı** |
+| REA-16 | AJ-21/22 — sınır sabitleri (`1e-06`, `1e-07`, `50`) | — | TODO (sayılar dize olarak aranmadı) |
 
-Çalıştırma:
+#### REA-15 — aralık mesajı parçalı, REA-08'in bağımsız tekrarı
 
-```
-python tools/rea_strings.py "<GPowerNT.exe yolu>" --ara "is outside the admissible range" --ara "There must be at least 2 groups"
-python tools/rea_strings.py "<GPowerNT.exe yolu>" --tara --en-fazla 40 > rea_kesif.md
-```
+`1855710` civarındaki dize tablosunda **ardışık** olarak şunlar duruyor:
 
-### REA-07 — hata metninin İKİ varyantı var
+| offset | parça |
+|---|---|
+| `1855710` | `is outside the admissible range (` |
+| `1855750` | `is outside the admissible range (` *(ikinci kopya)* |
+| `1855784` | ` must be non-negative.` |
+| `1855961` | `is outside the admissible range (` *(üçüncü kopya)* |
+| `1855997` | `is inside the prohibited range (` |
+| `1856032` | `Power must be greater than or equal to alpha.` |
+
+Alan adı (`Effect size f`, `Alpha`, `Power`) **bu parçanın içinde değil**;
+ayrı bir tabloda (`1852700`–`1852936`, REA-18). Yani ekranda gördüğümüz
+`"Alpha is outside the admissible range (1e-07, 1)."` cümlesi ikilide
+**tek parça halinde yoktur**; alan adı + sabit metin + sınırlar çalışma
+anında birleştirilir.
+
+Bu, **REA-08 ile aynı mimarinin ikinci bağımsız kanıtıdır**: G*Power'ın hata
+mesajları şablon + parça yapısıyla kuruluyor. Kılavuzda yazmayan bir
+uygulama ayrıntısı, çünkü kullanıcıya görünen şey yalnızca birleşmiş cümle.
+
+#### REA-04 — kritik F kapalı formla değil, ARAMAYLA bulunuyor
+
+| offset | dize |
+|---|---|
+| `1849244` | `FDist-Quantile: input parameter out of range` |
+| `1849292` | `FDist-Quantile: answer below lower search bound` |
+| `1849340` | `FDist-Quantile: answer above upper search bound` |
+| `1849388` | `FDist-Quantile: p + q != 1.0` |
+| `1849032` | `FDist-Pdf: failed to converge` |
+
+`search bound` ve `failed to converge` dizelerinin varlığı, kuantilin
+**alt/üst sınırlı iteratif bir aramayla** hesaplandığını gösterir: kapalı
+formülün "arama sınırı" diye bir kavramı olmaz. Aynı kalıp `ChiDist`,
+`CorrDist`, `BinomialDist`, `LaplaceDist`, `LogNormalDist` için de var —
+yani ortak bir dağılım kütüphanesi kullanılıyor (84 benzersiz dize).
+
+Bu, `AJ-07`'yi (kritik F = merkezî F'nin üst-α kuantili) *çürütmez*;
+sonucun nasıl **üretildiğini** gösterir. Bizim motorumuz `scipy.stats.f.isf`
+çağırıyor, G*Power kendi aramasını yapıyor; 44 satırda 4.8e−08'den küçük
+sapmayla aynı sonucu vermeleri bu yüzden anlamlı.
+
+#### REA-05 — yokluk da bulgudur
+
+`NoncentralF`, `NonCentral`, `oncentralF` dizelerinin **hiçbiri yok**
+(arama yapıldı, sonuç boş). Dağılım tablosunda merkezî olmayan F için
+**ayrı bir yordam adı bulunmuyor**. Merkezî olmayan kuyruk olasılığının
+nasıl hesaplandığı dize aramasıyla belirlenemez; kod akışı incelemesi
+gerekir. TODO kalıyor ama kapsamı daraldı.
+
+#### REA-19 — ikilide bir kural var, biz onu hiç görmedik
+
+`Power must be greater than or equal to alpha.` (`1856032`)
+
+`SPEC.md` 6.7 ve `EKSIK_VAKALAR` G-01…G-04, `power <= alpha` bandını
+**BELİRSİZ** bırakıyordu. İkili, böyle bir kısıtın **var olduğunu** söylüyor.
+Ama dikkat: bir dizenin ikilide bulunması, o kuralın **tek yönlü ANOVA
+a priori yolunda tetiklendiğini kanıtlamaz**. G*Power çok sayıda test ailesi
+içerir ve bu metin başka bir aileye ait olabilir.
+
+> **Motor şu an bu kuralı uygulamıyor:** `power = 0.01, alpha = 0.05`
+> verildiğinde hata atmak yerine en küçük uygun N'i döndürüyor (bu seçim
+> `grup2_python/test_anova_power.py` içinde gerekçesiyle yazılı).
+> **Sınanması gereken vektör:** a priori, `f=0.25, alpha=0.05, power=0.01,
+> groups=3`. G*Power hata verirse motor da vermeli.
+
+#### REA-20 — hiç gözlemlemediğimiz ikinci doğrulama kategorisi
+
+`is inside the prohibited range (` (`1855997`)
+
+60 vektörün hiçbirinde bu mesaj çıkmadı. "Kabul aralığı dışında" ile
+"yasaklı aralığın içinde" **farklı iki kavramdır**: ikincisi, geçerli
+aralığın ortasında bir deliğe işaret eder. Hangi alanın böyle bir deliği
+olduğu bilinmiyor. Kılavuzda bu ayrımdan söz edilmez.
+
+### REA-07 — hata metninin İKİ varyantı var### REA-07 — hata metninin İKİ varyantı var
 
 | offset | kodlama | alıntı |
 |---|---|---|
