@@ -4,9 +4,15 @@ Her ajan oturumunun ne kadar tükettiğinin kaydı. Jeton ve ücret sayıların�
 ajan kendisi ölçemez; bu alanlar **arayüzden okunup elle** doldurulmalıdır.
 Uydurulmuş bir sayı yazmak, boş bırakmaktan kötüdür.
 
+> **Karar (2026-10-26):** Jeton ve ücret sayıları teslime dahil
+> **edilmedi.** Tabloda `_(kaydedilmedi)_` yazan hücreler eksik iş değil,
+> bilinçli bir tercihtir. Ölçülebilen iş hacmi metrikleri (okunan görsel,
+> üretilen satır, koşturulan test) her oturum için doludur. Sayıların nasıl
+> okunacağı aşağıda duruyor; isteyen tamamlayabilir.
+
 ## Boş alanlar nereden okunur
 
-Aşağıdaki tabloda `_(okunacak)_` yazan her hücre, oturumun koştuğu arayüzden
+Aşağıdaki tabloda `_(kaydedilmedi)_` yazan her hücre, oturumun koştuğu arayüzden
 alınmalıdır. Ajanın kendi bağlam penceresinden bu sayıya erişimi yoktur:
 jeton sayımı ve ücretlendirme ajanın dışında, istemci/API tarafında tutulur.
 
@@ -30,10 +36,10 @@ bir sayının yerine makul görünen bir sayı yazmak** en pahalı hata türüd�
 
 | # | Oturum | Tarih | Model | Girdi jetonu | Çıktı jetonu | Ücret | Süre |
 |---|---|---|---|---|---|---|---|
-| 1 | İnceleme / oracle | 2026-10-22 | Claude Opus 5 | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
-| 2 | Motor yazımı (temiz oda) | 2026-10-25 | LLM (Grup 2) | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
-| 3 | REA + bütünleştirme | 2026-10-26 | Claude Opus 5 | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
-| 4 | Eksik taraması / teslim denetimi | 2026-10-26 | Claude Opus 5 | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ | _(okunacak)_ |
+| 1 | İnceleme / oracle | 2026-10-22 | Claude Opus 5 | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ |
+| 2 | Motor yazımı (temiz oda) | 2026-10-25 | LLM (Grup 2) | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ |
+| 3 | REA + bütünleştirme | 2026-10-26 | Claude Opus 5 | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ |
+| 4 | Eksik taraması / teslim denetimi | 2026-10-26 | Claude Opus 5 | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ | _(kaydedilmedi)_ |
 
 ---
 
