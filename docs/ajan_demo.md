@@ -136,8 +136,9 @@ yapmadığının testle kanıtıdır.
 
 ## Eksik
 
-- [ ] Claude Code oturumundan doğal dil dökümü / ekran görüntüsü
-      (`docs/ajan_demo_ekran.png`) — araç çağrısı ve cevabı birlikte görünmeli.
+- [x] Claude Code oturumundan doğal dil dökümü / ekran görüntüsü:
+      `docs/ajan_demo_ekran.png` — araç çağrısı ve cevabı birlikte görünüyor.
+      Ek olarak CLI demosu: `docs/cli_demo_ekran.png`.
 - [x] Demo videosu çekildi ve yayımlandı: https://youtu.be/5hJnOqY5SKM
       (README'deki "Demo Video" bölümünden de bağlı).
 

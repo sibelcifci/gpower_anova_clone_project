@@ -245,6 +245,13 @@ yoktur. Claude Code / Claude Desktop için kayıt `.mcp.json` dosyasındadır.
 Ajan `anova_a_priori` aracını `f=0.25, alpha=0.05, power=0.80, groups=3` ile
 çağırır ve `total_n = 159` döner. Örnek döküm: `docs/ajan_demo.md`.
 
+![AI ajanı MCP aracını çağırırken](docs/ajan_demo_ekran.png)
+
+_Ajan, doğal dildeki soruyu (`4 gruplu, f = 0.15, %90 güç`) MCP araç çağrısına
+çevirip sonucu cümleye döküyor: toplam **636**, grup başına 159, gerçekleşen güç
+0.9011. Hesabı ajan yapmıyor; `src/anova_power/core.py` yapıyor. CLI demosunun
+ekran görüntüsü: `docs/cli_demo_ekran.png`._
+
 ---
 
 ## REA / Ghidra Kontrolü
