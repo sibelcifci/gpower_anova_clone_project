@@ -8,9 +8,9 @@ Referans alınan yazılım **G*Power 3.1.9.7 (Windows)**'tur. Bu proje G*Power'�
 
 ### Geliştiriciler
 
-> Satırlar bilerek boş bırakılmıştır: her geliştirici kendi bilgisini kendisi yazar.
-> Alt grup sütunu temiz oda ayrımını gösterir — **Grup 1** oracle/SPEC tarafı,
-> **Grup 2** izolasyonlu kodlama tarafı (G*Power'ı hiç görmeyen ekip).
+> Ekip temiz oda gereği ikiye ayrılmıştır: **Alt Grup 1** oracle/SPEC tarafı
+> (G*Power'ı kullanıp davranışını ölçen ekip), **Alt Grup 2** izolasyonlu kodlama
+> tarafı (G*Power'ı hiç görmeyen ekip). Ayrıntı: "Proje Görev Dağılımı" bölümü.
 
 | # | Ad Soyad |
 |---|---|
