@@ -12,12 +12,12 @@ Referans alınan yazılım **G*Power 3.1.9.7 (Windows)**'tur. Bu proje G*Power'�
 > Alt grup sütunu temiz oda ayrımını gösterir — **Grup 1** oracle/SPEC tarafı,
 > **Grup 2** izolasyonlu kodlama tarafı (G*Power'ı hiç görmeyen ekip).
 
-| # | Ad Soyad | GitHub |
-|---|---|---|
-| 1 |  |  | 
-| 2 |  |  | 
-| 3 |  |  |
-| 4 |  |  | 
+| # | Ad Soyad |
+|---|---|
+| 1 | Gönül Nazire AYDIN |
+| 2 | Sibel ÇİFCİ |
+| 3 | Cem ERŞEN |
+| 4 | Korkut ŞAHAN | 
 
 > **Katmanlar:** Temel Katman (CLI) ✅, MCP sunucusu (+15) ✅, AI ajanı (+10) ✅.
 > Hesap mantığı tek motordadır (`src/anova_power/core.py`); CLI, MCP ve ajan bu
